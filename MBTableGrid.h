@@ -25,6 +25,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
+#import "DMTableGridCellQueue.h"
 
 @class MBTableGridHeaderView, MBTableGridFooterView, MBTableGridHeaderCell, MBTableGridContentView;
 @protocol MBTableGridDelegate, MBTableGridDataSource;
@@ -584,6 +585,14 @@ cells. A cell can individually override this behavior. */
  * @}
  */
 
+#pragma mark -
+#pragma mark new (DM)
+//[dm]
+
+- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier;
+- (NSTableCellView*)makeViewWithIdentifier:(NSString*)identifier owner:(id)owner;
+- (void)enqueueView:(NSView*)view forIdentifier:(NSString*)identifier;
+
 @end
 
 #pragma mark -
@@ -1097,6 +1106,9 @@ cells. A cell can individually override this behavior. */
 // Being a delegate, the entire protocol is optional
 @optional
 
+#pragma mark [dm]
+- (NSView*)tableGrid:(MBTableGrid*)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row;
+
 #pragma mark -
 #pragma mark Managing Selections
 /**
@@ -1273,5 +1285,7 @@ cells. A cell can individually override this behavior. */
 - (void)tableGrid:(MBTableGrid *)aTableGrid didAddRows:(NSIndexSet *)rowIndexes;
 
 - (void)tableGrid:(MBTableGrid*)aTableGrid footerCellClicked:(NSCell*)cell forColumn:(NSUInteger)columnIndex withEvent:(NSEvent*)theEvent;
+
+- (NSTableCellView*)sampleTableCell;
 
 @end

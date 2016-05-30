@@ -31,6 +31,7 @@
 #import "MBButtonCell.h"
 #import "MBImageCell.h"
 #import "MBLevelIndicatorCell.h"
+#import "MyTableCellView.h"
 
 #define kGRAB_HANDLE_HALF_SIDE_LENGTH 3.0f
 #define kGRAB_HANDLE_SIDE_LENGTH 6.0f
@@ -73,6 +74,16 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (void)_timerAutoscrollCallback:(NSTimer *)aTimer;
 @end
 
+@interface MBTableGridContentView ()
+{
+	CGFloat scrollPrefetchPosX;
+	CGFloat scrollPrefetchPosY;
+	CGFloat scrollPrefetchNegX;
+	CGFloat scrollPrefetchNegY;
+}
+@property (nonatomic, strong) NSMutableDictionary *activeTableCells; // key: indexPath value: {"view":view,"id":cellIdentifier}
+@end
+
 @implementation MBTableGridContentView
 
 @synthesize showsGrabHandle;
@@ -83,7 +94,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (instancetype)initWithFrame:(NSRect)frameRect andTableGrid:(MBTableGrid*)tableGrid
 {
-	if(self = [super initWithFrame:frameRect]) {
+	if (self = [super initWithFrame:frameRect]) {
 		
 		_tableGrid = tableGrid;
 		
@@ -108,6 +119,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		isDraggingColumnOrRow = NO;
         shouldDrawFillPart = MBTableGridTrackingPartNone;
 
+		self.activeTableCells = [NSMutableDictionary dictionary];
+		
 		_rowHeight = 20.0f;
 		
 		self.wantsLayer = true;
@@ -119,12 +132,37 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		[_defaultCell setLineBreakMode:NSLineBreakByTruncatingTail];
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mylistener:) name:@"NSMenuDidChangeItemNotification" object:nil];
+		
 	}
 	return self;
 }
 
+- (void)viewDidMoveToSuperview
+{
+	if (self.superview != nil) {
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(frameChanged:)
+													 name:@"NSViewFrameDidChangeNotification"
+												   object:self.superview];
+	}
+}
+
+- (void)frameChanged:(NSNotification*)notification
+{
+	NSLog(@"new frame: %@ for %@", NSStringFromRect(self.superview.frame), notification.object);
+	
+	NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
+
+	float pad = 1.5;
+	scrollPrefetchPosX = visibleRect.size.width * pad;
+	scrollPrefetchPosY = visibleRect.size.height * pad;
+	scrollPrefetchNegX = visibleRect.size.width * pad;
+	scrollPrefetchNegY = visibleRect.size.height * pad;
+}
+
 - (void) dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[self removeObserver:self forKeyPath:@"frame"];
 }
 
 - (void)mylistener:(id)sender
@@ -144,11 +182,76 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)drawRect:(NSRect)rect
 {
-    
-    NSIndexSet *selectedColumns = [_tableGrid selectedColumnIndexes];
+	NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
+
+	/*
+	 float pad = 2;
+	scrollPrefetchPosX = self.superview.bounds.size.width * pad;
+	scrollPrefetchPosY = self.superview.bounds.size.height * pad;
+	scrollPrefetchNegX = self.superview.bounds.size.width * pad;
+	scrollPrefetchNegY = self.superview.bounds.size.height * pad;
+	*/
+	
+	/*
+	self.scrollPrefetchPosX = MAX(self.scrollPrefetchPosX, ((NSMaxX(rect) - NSMaxX(visibleRect))/visibleRect.size.width));
+	self.scrollPrefetchPosY = MAX(self.scrollPrefetchPosY, ((NSMaxY(rect) - NSMaxY(visibleRect))/visibleRect.size.height));
+	self.scrollPrefetchNegX = MAX(self.scrollPrefetchNegX, ((NSMinX(visibleRect) - NSMinX(rect))/visibleRect.size.width));
+	self.scrollPrefetchNegY = MAX(self.scrollPrefetchNegY, ((NSMinY(visibleRect) - NSMinY(rect))/visibleRect.size.height));
+	*/
+	
+	// update prefetched distances based on what the framework is asking for, save the largest seen
+	//scrollPrefetchPosX = MAX(scrollPrefetchPosX, (NSMaxX(rect) - NSMaxX(visibleRect)));
+	//scrollPrefetchPosY = MAX(scrollPrefetchPosY, (NSMaxY(rect) - NSMaxY(visibleRect)));
+	//scrollPrefetchNegX = MAX(scrollPrefetchNegX, (NSMinX(visibleRect) - NSMinX(rect)));
+	//scrollPrefetchNegY = MAX(scrollPrefetchNegY, (NSMinY(visibleRect) - NSMinY(rect)));
+	
+	NSRect visiblePlusCachedRect = NSMakeRect(MAX(0, visibleRect.origin.x - scrollPrefetchNegX),
+											  MAX(0, visibleRect.origin.y - scrollPrefetchNegY),
+											  MIN(self.bounds.size.width, visibleRect.size.width + scrollPrefetchNegX + scrollPrefetchPosX),
+											  MIN(self.bounds.size.height, visibleRect.size.height + scrollPrefetchNegY + scrollPrefetchPosY));
+	
+	//NSLog(@"v:%@ r:%@ v+c:%@", NSStringFromRect(visibleRect), NSStringFromRect(rect), NSStringFromRect(visiblePlusCachedRect));
+	
+	//NSLog(@"x:%.2fx y:%.2fx x:%.0f y:%.0f", scrollPrefetchPosX, scrollPrefetchPosY, NSMaxX(rect)-NSMaxX(visibleRect), NSMaxY(rect)-NSMaxY(visibleRect));
+	
+	//if (NSMinX(visibleRect) >= NSMaxX(rect))
+		//NSLog(@"r:%@, v:%@", NSStringFromRect(rect), NSStringFromRect(visibleRect));
+//		NSLog(@"beyond: %.2fx (%.0f pix) [%.0f:%.0f] [%.0f:%.0f]", ((NSMaxX(rect) - NSMaxX(visibleRect))/visibleRect.size.width), NSMaxX(rect)-NSMaxX(visibleRect), NSMinX(visibleRect), NSMaxX(visibleRect), NSMinX(rect), NSMaxX(rect));
+	
+	NSIndexSet *selectedColumns = [_tableGrid selectedColumnIndexes];
     NSIndexSet *selectedRows = [_tableGrid selectedRowIndexes];
 	NSUInteger numberOfColumns = _tableGrid.numberOfColumns;
 	NSUInteger numberOfRows = _tableGrid.numberOfRows;
+
+	NSPoint diagonalFromOrigin = NSMakePoint(visiblePlusCachedRect.origin.x + visiblePlusCachedRect.size.width,
+											visiblePlusCachedRect.origin.y + visiblePlusCachedRect.size.height);
+	
+	NSUInteger minCol = MAX([self columnAtPoint:visiblePlusCachedRect.origin], 0);
+	NSUInteger maxCol = MIN([self columnAtPoint:diagonalFromOrigin], _tableGrid.numberOfColumns - 1);
+	
+	NSUInteger minRow = MAX([self rowAtPoint:visiblePlusCachedRect.origin], 0);
+	NSUInteger maxRow = MIN([self rowAtPoint:diagonalFromOrigin], _tableGrid.numberOfRows - 1);
+	
+	// build list of cells to draw as a set of  array of index paths
+	NSMutableArray *indexPathsToDraw = [NSMutableArray arrayWithCapacity:(maxCol-minCol+1)*(maxRow-minRow+1)];
+	for (NSUInteger columnIndex = minCol; columnIndex <= maxCol; columnIndex++) {
+		for (NSUInteger rowIndex = minRow; rowIndex <= maxRow; rowIndex++) {
+			NSUInteger indices[] = {columnIndex, rowIndex};
+			NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
+			[indexPathsToDraw addObject:indexPath];
+		}
+	}
+	
+	/*
+	NSUInteger minCol = [self columnAtPoint:rect.origin];
+	NSUInteger maxCol = [self columnAtPoint:NSMakePoint(rect.origin.x + rect.size.width, rect.origin.y + rect.size.height)];
+	maxCol = MIN(maxCol, _tableGrid.numberOfColumns - 1);
+	
+	NSUInteger minRow = [self rowAtPoint:rect.origin];
+	NSUInteger maxRow = [self rowAtPoint:NSMakePoint(rect.origin.x + rect.size.width, rect.origin.y + rect.size.height)];
+	maxRow = MIN(maxRow, _tableGrid.numberOfRows - 1);
+	
+	//NSLog(@"min/max: c[%d:%d] r[%d:%d]", minCol, maxCol, minRow, maxRow);
 	
 	NSUInteger firstColumn = NSNotFound;
     NSUInteger lastColumn = (numberOfColumns==0) ? 0 : numberOfColumns - 1;
@@ -159,16 +262,68 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSUInteger column = 0;
 	while (column < numberOfColumns) {
 		NSRect columnRect = [self rectOfColumn:column];
-		if (firstColumn == NSNotFound && NSMinX(rect) >= NSMinX(columnRect) && NSMinX(rect) <= NSMaxX(columnRect)) {
+		// sometimes visibleRect goes to < 0 (bouncy scrolling?)
+		if (firstColumn == NSNotFound && NSMinX(visibleRect) >= NSMinX(columnRect) && MAX(0, NSMinX(visibleRect)) <= NSMaxX(columnRect)) {
 			firstColumn = column;
-		} else if (firstColumn != NSNotFound && NSMaxX(rect) >= NSMinX(columnRect) && NSMaxX(rect) <= NSMaxX(columnRect)) {
+		} else if (firstColumn != NSNotFound && NSMaxX(visibleRect) >= NSMinX(columnRect) && MAX(0, NSMaxX(visibleRect)) <= NSMaxX(columnRect)) {
 			lastColumn = column;
 			break;
 		}
 		column++;
 	}
+	firstColumn = 0; //MAX(0, firstColumn); // make sure it's at least zero
 	
-	column = firstColumn;
+	// Build list of index paths based on columns to draw and number of visible rows.
+	// This might be a little overkill since whole rows or columns will ever be dropped at once,
+	// but at least this allows for the possiblity to expand the API to accept different views
+	// within the same column (something expected in a spreadsheet, for example).
+	//
+	NSMutableArray *indexPathsToDraw = [NSMutableArray arrayWithCapacity:(lastColumn-firstColumn)*(lastRow-firstRow)];
+	for (NSUInteger columnIndex = firstColumn; columnIndex <= lastColumn; columnIndex++) {
+		for (NSUInteger rowIndex = firstRow; rowIndex <= lastRow; rowIndex++) {
+			NSUInteger indices[] = {columnIndex, rowIndex};
+			NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
+			[indexPathsToDraw addObject:indexPath];
+		}
+	}
+	*/
+	
+	//NSLog(@"%@", NSStringFromRect(rect));
+	//NSLog(@"A: # of active cells: %d | c[%d:%d] r[%d:%d]", self.activeTableCells.count, minCol, maxCol, minRow, maxRow);
+	//NSLog(@"A: # of active cells: %d", self.activeTableCells.count);
+
+	// Remove views at index paths that are no longer visible
+	//
+	for (NSIndexPath *indexPath in self.activeTableCells.allKeys) {
+		// if a view is active but not in the list of paths to draw, enqueue view for reuse
+		if (![indexPathsToDraw containsObject:indexPath]) {
+			NSView *view = self.activeTableCells[indexPath];
+			[view removeFromSuperview];
+			[self.activeTableCells removeObjectForKey:indexPath];
+			[_tableGrid enqueueView:view forIdentifier:[view identifier]];
+			//NSLog(@"removing index path: %@", indexPath);
+		}
+	}
+	
+	diagonalFromOrigin = NSMakePoint(rect.origin.x + rect.size.width,
+									 rect.origin.y + rect.size.height);
+
+	minCol = MAX([self columnAtPoint:rect.origin], 0);
+	maxCol = MIN([self columnAtPoint:diagonalFromOrigin], _tableGrid.numberOfColumns - 1);
+	
+	minRow = MAX([self rowAtPoint:rect.origin], 0);
+	maxRow = MIN([self rowAtPoint:diagonalFromOrigin], _tableGrid.numberOfRows - 1);
+
+	//NSLog(@"c[%d:%d] r[%d:%d]", minCol, maxCol, minRow, maxRow);
+
+	NSUInteger firstColumn = minCol;
+	NSUInteger lastColumn = maxCol;
+	NSUInteger firstRow = minRow;
+	NSUInteger lastRow = maxRow;
+	
+	NSUInteger column = firstColumn;
+	
+//	column = firstColumn;
 	while (column <= lastColumn) {
 		NSUInteger row = firstRow;
 		while (row <= lastRow) {
@@ -183,8 +338,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			// if you type into a text field, the text doesn't get cleared first before you
 			// start typing. So this seems to make both conditions work.
 			
-			if ([self needsToDrawRect:cellFrame] && (!(row == editedRow && column == editedColumn) || [_cell isKindOfClass:MBPopupButtonCell.class])) {
-				
+			if ([self needsToDrawRect:cellFrame] && (!(row == editedRow && column == editedColumn) || [_cell isKindOfClass:MBPopupButtonCell.class]))
+			{
                 NSColor *backgroundColor = [_tableGrid _backgroundColorForColumn:column row:row] ?: NSColor.whiteColor;
 				
 				if (!_cell) {
@@ -196,12 +351,16 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				
 				id objectValue = nil;
 				
+				// get the NSCell from the data source
+				// -----------------------------------
 				if (isFilling && [selectedColumns containsIndex:column] && [selectedRows containsIndex:row]) {
 					objectValue = [_tableGrid _objectValueForColumn:mouseDownColumn row:mouseDownRow];
 				} else {
 					objectValue = [_tableGrid _objectValueForColumn:column row:row];
 				}
 				
+				// Get (and set) the object value of the cell
+				// ------------------------------------------
 				if ([_cell isKindOfClass:MBPopupButtonCell.class]) {
 					MBPopupButtonCell *cell = (MBPopupButtonCell *)_cell;
 					NSInteger index = [cell indexOfItemWithTitle:objectValue];
@@ -210,12 +369,12 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 					[_cell setObjectValue:objectValue];
 				}
 				
-				if ([_cell isKindOfClass:[MBPopupButtonCell class]]) {
+				if ([_cell isKindOfClass:MBPopupButtonCell.class]) {
 					
 					MBPopupButtonCell *cell = (MBPopupButtonCell *)_cell;
 					[cell drawWithFrame:cellFrame inView:self withBackgroundColor:backgroundColor];// Draw background color
 					
-				} else if ([_cell isKindOfClass:[MBImageCell class]]) {
+				} else if ([_cell isKindOfClass:MBImageCell.class]) {
 					
 					MBImageCell *cell = (MBImageCell *)_cell;
                     
@@ -223,7 +382,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 					
 					[cell drawWithFrame:cellFrame inView:self withBackgroundColor:backgroundColor];// Draw background color
 					
-				} else if ([_cell isKindOfClass:[MBLevelIndicatorCell class]]) {
+				} else if ([_cell isKindOfClass:MBLevelIndicatorCell.class]) {
 					
 					MBLevelIndicatorCell *cell = (MBLevelIndicatorCell *)_cell;
 
@@ -233,12 +392,28 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 					[cell drawWithFrame:cellFrame inView:_tableGrid withBackgroundColor:backgroundColor];// Draw background color
 					
 				} else {
+					// bog standard cell...
 					
+					/*
 					MBTableGridCell *cell = (MBTableGridCell *)_cell;
                     
                     cell.accessoryButtonImage = [_tableGrid _accessoryButtonImageForColumn:column row:row];
                     
 					[cell drawWithFrame:cellFrame inView:self withBackgroundColor:backgroundColor];// Draw background color
+					*/
+					
+					NSUInteger indices[] = {column, row};
+					NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
+
+					NSView *tableCellView = self.activeTableCells[indexPath];
+					if (tableCellView == nil) {
+						tableCellView = [_tableGrid.delegate tableGrid:_tableGrid viewForTableColumn:column andRow:row];
+						[self addSubview:tableCellView];
+						self.activeTableCells[indexPath] = tableCellView;
+						//NSLog(@"Adding index path: %@", indexPath);
+					}
+					tableCellView.frame = cellFrame;
+					
 					
 				}
 			}
@@ -246,6 +421,11 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		}
 		column++;
 	}
+	
+	//NSLog(@"B: # of active cells: %d", self.activeTableCells.count);
+//	if (self.activeTableCells.count == 0) {
+//		int i;
+//	}
 	
 	// Draw the selection rectangle
 	if(selectedColumns.count && selectedRows.count && _tableGrid.numberOfColumns > 0 && _tableGrid.numberOfRows > 0) {
@@ -634,6 +814,18 @@ NSString * const MBTableGridTrackingPartKey = @"part";
     }
 }
 
+/*
+- (void)scrollWheel:(NSEvent *)event
+{
+	CGFloat deltaX = event.scrollingDeltaX;
+	CGFloat deltaY = event.scrollingDeltaY;
+
+	NSLog(@"x:y [%.0f:%.0f]", deltaX, deltaY);
+	
+	[super scrollWheel:event];
+}
+*/
+
 #pragma mark Cursor Rects
 
 - (void)resetCursorRects
@@ -657,7 +849,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 		[self addCursorRect:[self visibleRect] cursor:[self _cellSelectionCursor]];
 		
-		if(showsGrabHandle) {
+		if (showsGrabHandle) {
 			[self addCursorRect:grabHandleRect cursor:[self _cellExtendSelectionCursor]];
 		}
 		
@@ -673,8 +865,15 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			
 			NSDivideRect(fillTrackingRect, &topFillTrackingRect, &bottomFillTrackingRect, selectionRect.origin.y + (selectionRect.size.height / 2.0), NSRectEdgeMinY);
 			
-			[self addTrackingArea:[[NSTrackingArea alloc] initWithRect:topFillTrackingRect options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow owner:self userInfo:@{MBTableGridTrackingPartKey : @(MBTableGridTrackingPartFillTop)}]];
-			[self addTrackingArea:[[NSTrackingArea alloc] initWithRect:bottomFillTrackingRect options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow owner:self userInfo:@{MBTableGridTrackingPartKey : @(MBTableGridTrackingPartFillBottom)}]];
+			[self addTrackingArea:[[NSTrackingArea alloc] initWithRect:topFillTrackingRect
+															   options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow
+																 owner:self
+															  userInfo:@{MBTableGridTrackingPartKey : @(MBTableGridTrackingPartFillTop)}]];
+			
+			[self addTrackingArea:[[NSTrackingArea alloc] initWithRect:bottomFillTrackingRect
+															   options:NSTrackingMouseEnteredAndExited | NSTrackingActiveInKeyWindow
+																 owner:self
+															  userInfo:@{MBTableGridTrackingPartKey : @(MBTableGridTrackingPartFillBottom)}]];
 		}
 	}
 }
@@ -1010,7 +1209,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (NSRect)rectOfRow:(NSUInteger)rowIndex
 {
-	NSRect rect = NSMakeRect(0, 0, [self frame].size.width, self.rowHeight);
+	NSRect rect = NSMakeRect(0, 0, self.frame.size.width, self.rowHeight);
 	rect.origin.y += self.rowHeight * rowIndex;
 	return rect;
 }
@@ -1027,7 +1226,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSInteger column = 0;
 	while(column < self.tableGrid.numberOfColumns) {
 		NSRect columnFrame = [self rectOfColumn:column];
-		if(aPoint.x > columnFrame.origin.x && aPoint.x < (columnFrame.origin.x + columnFrame.size.width)) {
+		if(aPoint.x >= columnFrame.origin.x && aPoint.x <= (columnFrame.origin.x + columnFrame.size.width)) {
 			return column;
 		}
 		column++;
@@ -1042,6 +1241,20 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		return row;
 	}
 	return NSNotFound;
+}
+
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
+{
+	if (object == self.superview) { // clip view
+		NSLog(@" changed");
+		if ([keyPath isEqualToString:@"frame"]) {
+			// the amount of view prefetching seems to depend on the window bounds; reset when those change
+			scrollPrefetchPosX = self.bounds.size.width * 2;
+			scrollPrefetchPosY = self.bounds.size.height * 2;
+			scrollPrefetchNegX = self.bounds.size.width * 2;
+			scrollPrefetchNegY = self.bounds.size.height * 2;
+		}
+	}
 }
 
 @end

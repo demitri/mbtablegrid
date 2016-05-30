@@ -87,6 +87,7 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 		sortButton.tag = cellNumber.integerValue;
 		sortButton.target = self.tableGrid;
 		sortButton.action = @selector(sortButtonClicked:);
+		sortButton.wantsLayer = YES;
 
 		[self addSubview:sortButton];
 		

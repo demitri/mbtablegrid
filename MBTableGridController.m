@@ -31,6 +31,7 @@
 #import "MBLevelIndicatorCell.h"
 #import "MBFooterTextCell.h"
 #import "MBFooterPopupButtonCell.h"
+#import "DMTableGridCellQueue.h"
 
 NSString* kAutosavedColumnWidthKey = @"AutosavedColumnWidth";
 NSString* kAutosavedColumnIndexKey = @"AutosavedColumnIndex";
@@ -54,6 +55,9 @@ NSString * const ColumnText4 = @"text4";
 @end
 
 @interface MBTableGridController()
+{
+	BOOL _awakeFromNibInitialized;
+}
 @property (nonatomic, strong) MBPopupButtonCell *popupCell;
 @property (nonatomic, strong) MBTableGridCell *textCell;
 @property (nonatomic, strong) MBButtonCell *checkboxCell;
@@ -63,14 +67,33 @@ NSString * const ColumnText4 = @"text4";
 @property (nonatomic, strong) MBFooterPopupButtonCell *footerPopupCell;
 @property (nonatomic, strong) NSDictionary *columnWidths;
 @property (nonatomic, strong) NSMutableArray *columnIdentifiers;
+- (void)commonInit;
 @end
 
 @implementation MBTableGridController
 
+- (instancetype)init
+{
+	self = [super init];
+	if (self) {
+		[self commonInit];
+	}
+	return self;
+}
+
+- (void)commonInit
+{
+	_awakeFromNibInitialized = NO;
+}
+
 - (void)awakeFromNib 
 {
-    
-    
+	if (_awakeFromNibInitialized)
+		return;
+	
+	[self.tableGrid registerNib:[[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil]
+			 forIdentifier:@"BasicCellView"];
+	
     columnSampleWidths = @[@40, @50, @60, @70, @80, @90, @100, @110, @120, @130];
     
 	columns = [[NSMutableArray alloc] initWithCapacity:10];
@@ -80,10 +103,10 @@ NSString * const ColumnText4 = @"text4";
 	NSDictionary *infoDict = [[NSBundle mainBundle] infoDictionary];
 	NSString *gridComponentID = [infoDict objectForKey:@"GridComponentID"];
 
-	tableGrid.autosaveName = [NSString stringWithFormat:@"MBTableGrid Columns records-table-%@", gridComponentID];
+	self.tableGrid.autosaveName = [NSString stringWithFormat:@"MBTableGrid Columns records-table-%@", gridComponentID];
 	
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
-	self.columnWidths = [defaults objectForKey:tableGrid.autosaveName];
+	self.columnWidths = [defaults objectForKey:self.tableGrid.autosaveName];
 
 	NSNumberFormatter *decimalFormatter = [[NSNumberFormatter alloc] init];
 	decimalFormatter.numberStyle = NSNumberFormatterCurrencyStyle;
@@ -94,15 +117,15 @@ NSString * const ColumnText4 = @"text4";
     formatters = @{ColumnCurrency : decimalFormatter, ColumnDate : dateFormatter};
     
 	// Add 10 columns & rows
-    [self tableGrid:tableGrid addColumns:10 shouldReload:NO];
-    [self tableGrid:tableGrid addRows:10 shouldReload:NO];
+    [self tableGrid:self.tableGrid addColumns:150 shouldReload:NO];
+    [self tableGrid:self.tableGrid addRows:150 shouldReload:NO];
 	
-	[tableGrid setIndicatorImage:[NSImage imageNamed:@"sort-asc"] reverseImage:[NSImage imageNamed:@"sort-desc"] inColumns:@[@1,@3]];
+	[self.tableGrid setIndicatorImage:[NSImage imageNamed:@"sort-asc"] reverseImage:[NSImage imageNamed:@"sort-desc"] inColumns:@[@1,@3]];
 	
-	[tableGrid reloadData];
+	[self.tableGrid reloadData];
 	
 	// Register to receive text strings
-	[tableGrid registerForDraggedTypes:@[NSStringPboardType]];
+	[self.tableGrid registerForDraggedTypes:@[NSStringPboardType]];
 	
 	self.popupCell = [[MBPopupButtonCell alloc] initTextCell:@""];
 	self.popupCell.bordered = NO;
@@ -140,6 +163,8 @@ NSString * const ColumnText4 = @"text4";
     menu.font = self.footerPopupCell.font;
     [menu addItemWithTitle:@"No Options" action:nil keyEquivalent:@""];
     self.footerPopupCell.menu = menu;
+	
+	_awakeFromNibInitialized = YES;
 }
 
 -(NSString *) genRandStringLength: (int) len
@@ -259,7 +284,7 @@ NSString * const ColumnText4 = @"text4";
 		return nil;
 	}
 	
-	if (tableGrid.selectedRowIndexes.count == 1 && [tableGrid.selectedRowIndexes containsIndex:row]) {
+	if (self.tableGrid.selectedRowIndexes.count == 1 && [self.tableGrid.selectedRowIndexes containsIndex:row]) {
 		NSImage *buttonImage = [NSImage imageNamed:@"acc-quicklook"];
 		
 		return buttonImage;
@@ -672,7 +697,7 @@ NSString * const ColumnText4 = @"text4";
     }
     
     if (shouldReload) {
-        [tableGrid reloadData];
+        [self.tableGrid reloadData];
     }
     
     return YES;
@@ -736,6 +761,16 @@ NSString * const ColumnText4 = @"text4";
     // Add the rows to the database, or whatever is needed
 }
 
+#pragma mark DM methods
+
+- (NSView*)tableGrid:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row
+{
+	NSView *view = [self.tableGrid makeViewWithIdentifier:@"BasicCellView" owner:self];
+	return view;
+}
+
+#pragma mark -
+
 #pragma mark - QuickLook
 
 -(void)quickLookAction:(id)sender {
@@ -798,11 +833,11 @@ NSString * const ColumnText4 = @"text4";
 - (NSRect)previewPanel:(QLPreviewPanel *)panel sourceFrameOnScreenForPreviewItem:(id <QLPreviewItem>)item {
 	
 	// convert selected cell rect to screen coordinates
-	NSInteger selectedColumn = [tableGrid.selectedColumnIndexes firstIndex];
-	NSInteger selectedRow = [tableGrid.selectedRowIndexes firstIndex];
-	NSCell *selectedCell = [tableGrid selectedCell];
+	NSInteger selectedColumn = [self.tableGrid.selectedColumnIndexes firstIndex];
+	NSInteger selectedRow = [self.tableGrid.selectedRowIndexes firstIndex];
+	NSCell *selectedCell = [self.tableGrid selectedCell];
 	
-	NSRect photoPreviewFrame = [tableGrid frameOfCellAtColumn:selectedColumn row:selectedRow];
+	NSRect photoPreviewFrame = [self.tableGrid frameOfCellAtColumn:selectedColumn row:selectedRow];
 	NSRect rectInWinCoords = [selectedCell.controlView convertRect:photoPreviewFrame toView:nil];
 	NSRect rectInScreenCoords = [[NSApp mainWindow] convertRectToScreen:rectInWinCoords];
 	
@@ -815,12 +850,12 @@ NSString * const ColumnText4 = @"text4";
 
 - (IBAction)addColumn:(id)sender
 {
-    [self tableGrid:tableGrid addColumns:1 shouldReload:YES];
+    [self tableGrid:self.tableGrid addColumns:1 shouldReload:YES];
 }
 
 - (IBAction)addRow:(id)sender
 {
-    [self tableGrid:tableGrid addRows:1 shouldReload:YES];
+    [self tableGrid:self.tableGrid addRows:1 shouldReload:YES];
 }
 
 @end

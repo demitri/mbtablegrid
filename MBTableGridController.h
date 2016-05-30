@@ -28,7 +28,7 @@
 #import <Quartz/Quartz.h>
 
 @interface MBTableGridController : NSObject <MBTableGridDataSource, MBTableGridDelegate, QLPreviewPanelDelegate, QLPreviewPanelDataSource> {
-	IBOutlet MBTableGrid *tableGrid;
+//	IBOutlet MBTableGrid *tableGrid;
 	NSMutableArray *columns;
 	NSDictionary *formatters;
     NSArray *columnSampleWidths;
@@ -36,5 +36,9 @@
 
 - (IBAction)addColumn:(id)sender;
 - (IBAction)addRow:(id)sender;
+
+@property (nonatomic, strong) IBOutlet MBTableGrid *tableGrid;
+//@property (nonatomic, strong) NSTableCellView *sampleTableCell;
+//- (NSTableCellView*)sampleTableCell;
 
 @end
