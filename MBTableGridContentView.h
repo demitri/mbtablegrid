@@ -173,7 +173,7 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
  *				lies outside the receiver's bounds.
  * @see			rowAtPoint:
  */
-- (NSInteger)columnAtPoint:(NSPoint)aPoint;
+- (NSUInteger)columnAtPoint:(NSPoint)aPoint;
 
 /**
  * @brief		Returns the index of the row a given point lies in.
@@ -182,7 +182,7 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
  *				lies outside the receiver's bounds.
  * @see			columnAtPoint:
  */
-- (NSInteger)rowAtPoint:(NSPoint)aPoint;
+- (NSUInteger)rowAtPoint:(NSPoint)aPoint;
 
 - (void)textDidBeginEditingWithEditor:(NSText *)editor;
 

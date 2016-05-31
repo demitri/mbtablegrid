@@ -23,6 +23,8 @@
  OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#include <stdlib.h>
+
 #import "MBTableGridController.h"
 #import "MBTableGridCell.h"
 #import "MBPopupButtonCell.h"
@@ -765,7 +767,10 @@ NSString * const ColumnText4 = @"text4";
 
 - (NSView*)tableGrid:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row
 {
-	NSView *view = [self.tableGrid makeViewWithIdentifier:@"BasicCellView" owner:self];
+	NSTableCellView *view = [self.tableGrid makeViewWithIdentifier:@"BasicCellView" owner:self];
+	view.textField.stringValue = [NSString stringWithFormat:@"%d", arc4random_uniform(42)];
+//	view.textField.stringValue = [NSString stringWithFormat:@"%lu x %lu", (unsigned long)columnIndex, (unsigned long)row];
+	view.canDrawSubviewsIntoLayer = YES;
 	return view;
 }
 

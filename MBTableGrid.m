@@ -118,10 +118,15 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		self.cellQueue = [[DMTableGridCellQueue alloc] init];
 
 		// Post frame changed notifications
+		// --------------------------------
 		[self setPostsFrameChangedNotifications:YES];
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(viewFrameDidChange:) name:NSViewFrameDidChangeNotification object:self];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												selector:@selector(viewFrameDidChange:)
+													name:NSViewFrameDidChangeNotification
+												   object:self];
 
 		// Set the default cell
+		// --------------------
 		MBTableGridCell *defaultCell = [[MBTableGridCell alloc] initTextCell:@""];
 		defaultCell.bordered = YES;
 		defaultCell.scrollable = YES;
@@ -129,6 +134,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		self.cell = defaultCell;
 
 		// Setup the column headers
+		// ------------------------
 		NSRect columnHeaderFrame = NSMakeRect(MBTableGridRowHeaderWidth, 0,
 											  frameRect.size.width - MBTableGridRowHeaderWidth,
 											  MBTableGridColumnHeaderHeight);
@@ -136,6 +142,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		columnHeaderScrollView = [[NSScrollView alloc] initWithFrame:columnHeaderFrame];
 		//columnHeaderScrollView = [[JNWScrollView alloc] initWithFrame:columnHeaderFrame];
 		columnHeaderScrollView.wantsLayer = YES;
+		columnHeaderScrollView.horizontalScrollElasticity = NSScrollElasticityNone;
+		columnHeaderScrollView.verticalScrollElasticity = NSScrollElasticityNone;
 		columnHeaderView = [[MBTableGridHeaderView alloc] initWithFrame:NSMakeRect(0, 0,
 																				   columnHeaderFrame.size.width,
 																				   columnHeaderFrame.size.height)
@@ -149,10 +157,13 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		[self addSubview:columnHeaderScrollView];
 
 		// Setup the row headers
+		// ---------------------
 		NSRect rowHeaderFrame = NSMakeRect(0, MBTableGridColumnHeaderHeight, MBTableGridRowHeaderWidth, [self frame].size.height - MBTableGridColumnHeaderHeight * 2);
 		rowHeaderScrollView = [[NSScrollView alloc] initWithFrame:rowHeaderFrame];
 //		rowHeaderScrollView = [[JNWScrollView alloc] initWithFrame:rowHeaderFrame];
 		rowHeaderScrollView.wantsLayer = YES;
+		rowHeaderScrollView.horizontalScrollElasticity = NO;
+		rowHeaderScrollView.verticalScrollElasticity = NO;
 		rowHeaderView = [[MBTableGridHeaderView alloc] initWithFrame:NSMakeRect(0, 0, rowHeaderFrame.size.width, rowHeaderFrame.size.height)
 														andTableGrid:self];
 		rowHeaderView.wantsLayer = YES;
@@ -164,11 +175,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		[self addSubview:rowHeaderScrollView];
 		
 		// Setup the footer view
+		// ---------------------
 		NSRect columnFooterFrame = NSMakeRect(MBTableGridRowHeaderWidth, frameRect.size.height - MBTableGridColumnHeaderHeight, frameRect.size.width - MBTableGridRowHeaderWidth, MBTableGridColumnHeaderHeight);
 		
 		columnFooterScrollView = [[NSScrollView alloc] initWithFrame:columnFooterFrame];
 //		columnFooterScrollView = [[JNWScrollView alloc] initWithFrame:columnFooterFrame];
 		columnFooterScrollView.wantsLayer = YES;
+		columnFooterScrollView.horizontalScrollElasticity = NO;
+		columnFooterScrollView.verticalScrollElasticity = NO;
 		columnFooterView = [[MBTableGridFooterView alloc] initWithFrame:NSMakeRect(0, 0,
 																				   columnFooterFrame.size.width,
 																				   columnFooterFrame.size.height)
@@ -181,6 +195,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		[self addSubview:columnFooterScrollView];
 
 		// Setup the content view
+		// ----------------------
 		NSRect contentFrame = NSMakeRect(MBTableGridRowHeaderWidth, MBTableGridColumnHeaderHeight,
 										 self.frame.size.width - MBTableGridRowHeaderWidth,
 										 self.frame.size.height - MBTableGridColumnHeaderHeight - MBTableGridColumnHeaderHeight);
@@ -195,6 +210,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		contentScrollView.hasHorizontalScroller = YES;
 		contentScrollView.hasVerticalScroller = YES;
 		contentScrollView.autohidesScrollers = YES;
+		contentScrollView.horizontalScrollElasticity = NSScrollElasticityNone;
+		contentScrollView.verticalScrollElasticity = NSScrollElasticityNone;
 
 		[self addSubview:contentScrollView];
 
@@ -304,6 +321,12 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 - (void)setAutosaveName:(NSString *)autosaveName {
 	_autosaveName = autosaveName;
 	self.columnHeaderView.autosaveName = autosaveName;
+}
+
+// view optimization, only called in 10.10+
+- (BOOL)isOpaque
+{
+	return YES;
 }
 
 - (void)drawRect:(NSRect)aRect {
