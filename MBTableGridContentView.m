@@ -60,6 +60,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (void)_setFooterValue:(id)value forColumn:(NSUInteger)columnIndex;
 @end
 
+#pragma mark -
+
 @interface MBTableGridContentView (Cursors)
 - (NSCursor *)_cellSelectionCursor;
 - (NSImage *)_cellSelectionCursorImage;
@@ -68,12 +70,16 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (NSImage *)_grabHandleImage;
 @end
 
+#pragma mark -
+
 @interface MBTableGridContentView (DragAndDrop)
 - (void)_setDraggingColumnOrRow:(BOOL)flag;
 - (void)_setDropColumn:(NSInteger)columnIndex;
 - (void)_setDropRow:(NSInteger)rowIndex;
 - (void)_timerAutoscrollCallback:(NSTimer *)aTimer;
 @end
+
+#pragma mark -
 
 @interface MBTableGridContentView ()
 {
@@ -85,7 +91,11 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 @property (nonatomic, strong) DMActiveCellsCache *activeCellsCache;
 //@property (nonatomic, strong) NSMutableDictionary *activeTableCells; // key: indexPath value: {"view":view,"id":cellIdentifier}
 @property (nonatomic, strong) NSMutableDictionary *activeTableCells; // key: @(colNum) value: NSMutableArray <key:rowNum value:cellView>
+@property (nonatomic, strong) NSMutableDictionary *visibleCells; // key: NSIndexPath value: view
 @end
+
+#pragma mark -
+#pragma mark -
 
 @implementation MBTableGridContentView
 
@@ -135,10 +145,14 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		[_defaultCell setScrollable:YES];
 		[_defaultCell setLineBreakMode:NSLineBreakByTruncatingTail];
 		
-		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(mylistener:) name:@"NSMenuDidChangeItemNotification" object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(mylistener:)
+													 name:@"NSMenuDidChangeItemNotification"
+												   object:nil];
 		
 		// +[dm]
 		//self.canDrawSubviewsIntoLayer = YES;
+		self.visibleCells = [NSMutableDictionary dictionary];
 	}
 	return self;
 }
@@ -149,7 +163,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(frameChanged:)
 													 name:@"NSViewFrameDidChangeNotification"
-												   object:self.superview];
+												   object:self.superview]; // clip view
+
+		NSAssert(self.enclosingScrollView != nil, @"document view not placed inside a scroll view");
 	}
 }
 
@@ -228,16 +244,18 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 }
 
 // ---------------------------------------------------------
+/*
 - (void)prepareContentInRect:(NSRect)rect
 {
 	CFTimeInterval startTime = CACurrentMediaTime();
 
+	NSRect visibleRect = self.enclosingScrollView.documentVisibleRect;
+	
 	// rect is the overdraw region - use this hook to add/remove NSView cells
 	// passed rect is visible rect + overdraw region
 	//
 	NSRect originalRect = rect;
-	NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
-	//NSLog(@"rect: %@", NSStringFromRect(rect));
+ 	//NSLog(@"rect: %@", NSStringFromRect(rect));
 	if (rect.origin.x < 0) {
 		rect.size.width = rect.size.width - rect.origin.x;
 		rect.origin.x = 0;
@@ -353,6 +371,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	
 	[super prepareContentInRect:rect]; //NSUnionRect(r1, r2)];
 }
+*/
 
 // ---------------------------------------------------------
 - (void)drawRect:(NSRect)rect
@@ -1135,6 +1154,108 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 }
 
 #pragma mark -
+#pragma mark [dm] Layout methods
+
+- (void)resetDocumentView
+{
+	// Reset document (this class) size.
+	//
+
+	// Determine document frame
+	// ------------------------
+	// get widths of all columns (this is cached elsewhere can can be calculated more directly,
+	//    also, add grid lines)
+	NSUInteger documentWidth = 0;
+	NSUInteger numberOfColumns = _tableGrid.numberOfColumns;
+	for (NSUInteger i=0; i < numberOfColumns; i++) {
+		NSRect frame = [self frameOfCellAtColumn:i row:0];
+		documentWidth += frame.size.width;
+	}
+	
+	NSUInteger cellHeight = [self frameOfCellAtColumn:0 row:0].size.height;
+	
+	self.frame = CGRectMake(0, 0, documentWidth, cellHeight * _tableGrid.numberOfRows);
+	
+	self.needsLayout = YES;
+}
+
+// ------------------------------------------------------------------
+- (void)layout
+{
+	// Note: this will only be called if auto layout is turned on.
+	[super layout];
+	
+	if (_tableGrid.dataSource == nil)
+		return;
+	
+	// determine cells in visible rect
+	// -------------------------------
+	NSRect visibleRect = self.enclosingScrollView.documentVisibleRect;
+	NSPoint visibleRectDiagonalPoint = NSMakePoint(visibleRect.origin.x + visibleRect.size.width,
+												   visibleRect.origin.y + visibleRect.size.height);
+	
+	NSUInteger minCol = [self columnAtPoint:visibleRect.origin];
+	NSUInteger maxCol = [self columnAtPoint:visibleRectDiagonalPoint];
+	NSUInteger minRow = [self rowAtPoint:visibleRect.origin];
+	NSUInteger maxRow = [self rowAtPoint:visibleRectDiagonalPoint];
+	
+	
+	NSArray *oldVisibleIndexPaths = self.visibleCells.allKeys; // save current index pathsof visible cells
+
+	// build list of current visible index paths
+	NSMutableArray *newVisibleIndexPaths = [NSMutableArray array];
+	for (int col=minCol; col < maxCol+1; col++)
+	{
+		for (int row=minRow; row < maxRow+1; row++) {
+			NSUInteger indices[] = {col, row};
+			NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
+			[newVisibleIndexPaths addObject:indexPath];
+		}
+	}
+	
+	// determine which index paths were visible and are no longer
+	NSMutableArray *indexPathsToRemove = [NSMutableArray arrayWithArray:oldVisibleIndexPaths];
+	[indexPathsToRemove removeObjectsInArray:newVisibleIndexPaths];
+	
+	// determine which index paths are just now becoming visible
+	NSMutableArray *indexPathsToAdd = [NSMutableArray arrayWithArray:newVisibleIndexPaths];
+	[indexPathsToAdd removeObjectsInArray:oldVisibleIndexPaths];
+	
+	// Remove old cells; place into reuse queue.
+	//
+	for (NSIndexPath *path in indexPathsToRemove) {
+		NSView *view = self.visibleCells[path];
+		[self.visibleCells removeObjectForKey:path];
+		[_tableGrid enqueueView:view forIdentifier:view.identifier];
+		
+		// No cells are ever removed while the document view frame size doesn't change.
+		// Instead their frames just change. This might be modified/optimized if the
+		// cell count gets too high.
+		view.hidden = YES;
+	}
+	
+	// Add new cells
+	//
+	for (NSIndexPath *indexPath in indexPathsToAdd) {
+		NSUInteger column = [indexPath indexAtPosition:0];
+		NSUInteger row = [indexPath indexAtPosition:1];
+		NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
+								   viewForTableColumn:column
+											   andRow:row];
+		view.frame = [self frameOfCellAtColumn:column row:row];
+		if (view.superview == nil)
+			[self addSubview:view];
+		else
+			view.hidden = NO;
+		
+		self.visibleCells[indexPath] = view;
+		
+		// handle selection
+	}
+	
+}
+
+#pragma mark -
 #pragma mark Notifications
 
 #pragma mark Field Editor
@@ -1445,7 +1566,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		if (!foundRect) {
 			float width = [self.tableGrid _widthForColumn:columnIndex];
 			
-			rect = NSMakeRect(0, 0, width, [self frame].size.height);
+			rect = NSMakeRect(0, 0, width, self.frame.size.height);
 			//rect.origin.x += 60.0 * columnIndex;
 			
 			NSUInteger i = 0;
@@ -1516,6 +1637,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 }
 
 @end
+
+#pragma mark -
+#pragma mark -
 
 @implementation MBTableGridContentView (Cursors)
 
@@ -1654,6 +1778,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 }
 
 @end
+
+#pragma mark -
 
 @implementation MBTableGridContentView (DragAndDrop)
 
