@@ -1172,17 +1172,22 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		documentWidth += frame.size.width;
 	}
 	
-	NSUInteger cellHeight = [self frameOfCellAtColumn:0 row:0].size.height;
-	
-	self.frame = CGRectMake(0, 0, documentWidth, cellHeight * _tableGrid.numberOfRows);
+	self.frame = CGRectMake(0, 0, documentWidth, self.rowHeight * _tableGrid.numberOfRows);
 	
 	self.needsLayout = YES;
+}
+
+- (BOOL)wantsUpdateLayer
+{
+	return YES;
 }
 
 // ------------------------------------------------------------------
 - (void)layout
 {
-	// Note: this will only be called if auto layout is turned on.
+	// Note: "layout" will only be called if auto layout is turned on
+	//		 OR wantsUpdateLayer returns YES.
+	//
 	[super layout];
 	
 	if (_tableGrid.dataSource == nil)
@@ -1199,6 +1204,10 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSUInteger minRow = [self rowAtPoint:visibleRect.origin];
 	NSUInteger maxRow = [self rowAtPoint:visibleRectDiagonalPoint];
 	
+	NSAssert(minCol != NSNotFound, @"minCol not found");
+	NSAssert(maxCol != NSNotFound, @"maxCol not found");
+	NSAssert(minRow != NSNotFound, @"minRow not found");
+	NSAssert(maxRow != NSNotFound, @"maxRow not found");
 	
 	NSArray *oldVisibleIndexPaths = self.visibleCells.allKeys; // save current index pathsof visible cells
 
@@ -1242,9 +1251,29 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
 								   viewForTableColumn:column
 											   andRow:row];
-		view.frame = [self frameOfCellAtColumn:column row:row];
-		if (view.superview == nil)
+		view.translatesAutoresizingMaskIntoConstraints = NO;
+		
+		NSRect cellFrame = [self frameOfCellAtColumn:column row:row];
+		if (view.superview == nil) {
 			[self addSubview:view];
+			
+			NSDictionary *d = NSDictionaryOfVariableBindings(view);
+			NSLayoutConstraint *verticalConstraint = [NSLayoutConstraint constraintWithItem:view
+																				  attribute:NSLayoutAttributeTop
+																				  relatedBy:NSLayoutRelationEqual
+																					 toItem:self
+																				  attribute:NSLayoutAttributeTop
+																				 multiplier:1.0f
+																				   constant:cellFrame.origin.y];
+			NSLayoutConstraint *verticalConstraint = [NSLayoutConstraint constraintWithItem:view
+																				  attribute:NSLayoutAttributeTop
+																				  relatedBy:NSLayoutRelationEqual
+																					 toItem:self
+																				  attribute:NSLayoutAttributeTop
+																				 multiplier:1.0f
+																				   constant:cellFrame.origin.y];
+			verticalConstraint.active = YES;
+		}
 		else
 			view.hidden = NO;
 		
