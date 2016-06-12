@@ -205,6 +205,9 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		contentView = [[MBTableGridContentView alloc] initWithFrame:NSMakeRect(0, 0, contentFrame.size.width, contentFrame.size.height)
 													   andTableGrid:self];
 		contentView.wantsLayer = YES;
+		contentView.autoresizesSubviews = NO; // [dm]
+
+		contentScrollView.autoresizesSubviews = YES; // [dm]
 		contentScrollView.documentView = contentView;
 		contentScrollView.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
 		contentScrollView.hasHorizontalScroller = YES;

@@ -38,6 +38,16 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
     MBTableGridTrackingPartFillBottom
 };
 
+@interface DMStackView : NSStackView
+@property (nonatomic, assign) BOOL visible;
+@property (nonatomic, assign) unsigned int column;
+@property (nonatomic, weak) NSLayoutConstraint *widthConstraint;
+//@property (nonatomic, weak) NSLayoutConstraint *spacerViewHeightConstraint;
+//@property (nonatomic, strong) NSView *spacerView; // at the top, first view
+@property (nonatomic, weak) NSLayoutConstraint *leftConstraint;
+@property (nonatomic, assign) NSRange rowsInStack;
+@end
+
 @class MBTableGrid, MBTableGridCell;
 
 /**
@@ -95,6 +105,11 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
  */
 //- (MBTableGrid *)tableGrid;
 @property (nonatomic, weak) MBTableGrid *tableGrid;
+
+/**
+ doc me
+ */
+@property (nonatomic, assign) CGFloat gridLineThickness;
 
 /**
  * @}

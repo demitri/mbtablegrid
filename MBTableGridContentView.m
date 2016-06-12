@@ -36,8 +36,13 @@
 
 #define kGRAB_HANDLE_HALF_SIDE_LENGTH 3.0f
 #define kGRAB_HANDLE_SIDE_LENGTH 6.0f
+#define kTOP_CONSTRAINT @"top"
+#define kLEFT_CONSTRAINT @"left"
 
 NSString * const MBTableGridTrackingPartKey = @"part";
+
+@implementation DMStackView
+@end
 
 @interface MBTableGrid (Private)
 - (id)_objectValueForColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex;
@@ -92,6 +97,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //@property (nonatomic, strong) NSMutableDictionary *activeTableCells; // key: indexPath value: {"view":view,"id":cellIdentifier}
 @property (nonatomic, strong) NSMutableDictionary *activeTableCells; // key: @(colNum) value: NSMutableArray <key:rowNum value:cellView>
 @property (nonatomic, strong) NSMutableDictionary *visibleCells; // key: NSIndexPath value: view
+@property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMStackView*> *stackViewForColumn;
 @end
 
 #pragma mark -
@@ -134,6 +140,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 		self.activeTableCells = [NSMutableDictionary dictionary];
 		self.activeCellsCache = [[DMActiveCellsCache alloc] init];
+		self.stackViewForColumn = [NSMutableDictionary dictionary];
 		
 		_rowHeight = 20.0f;
 		
@@ -153,6 +160,18 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		// +[dm]
 		//self.canDrawSubviewsIntoLayer = YES;
 		self.visibleCells = [NSMutableDictionary dictionary];
+		self.autoresizesSubviews = NO;
+		self.gridLineThickness = 1.0f;
+		self.translatesAutoresizingMaskIntoConstraints = NO;
+		self.enclosingScrollView.contentView.postsBoundsChangedNotifications = YES;
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(updateCellSubviews:)
+													 name:NSViewBoundsDidChangeNotification
+												   object:self.enclosingScrollView.contentView];
+		[self addObserver:self
+			   forKeyPath:@"bounds"
+				  options:NSKeyValueObservingOptionNew
+				  context:nil];
 	}
 	return self;
 }
@@ -187,6 +206,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (void) dealloc {
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self removeObserver:self forKeyPath:@"frame"];
+	[self removeObserver:self forKeyPath:@"bounds"];
 }
 
 - (void)mylistener:(id)sender
@@ -583,7 +603,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //	NSUInteger column = firstColumn;
 	
 //	column = firstColumn;
-	for (NSUInteger column=firstColumn; column <= lastColumn; column++) {
+	if (0) {
+		NSUInteger column = 0;
+//	for (NSUInteger column=firstColumn; column <= lastColumn; column++) {
 		
 		//if (column < minCol || column > maxCol)
 		//	continue;
@@ -1163,7 +1185,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 	// Determine document frame
 	// ------------------------
-	// get widths of all columns (this is cached elsewhere can can be calculated more directly,
+	// get widths of all columns (this is cached elsewhere and can be calculated more directly,
 	//    also, add grid lines)
 	NSUInteger documentWidth = 0;
 	NSUInteger numberOfColumns = _tableGrid.numberOfColumns;
@@ -1182,8 +1204,249 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	return YES;
 }
 
+- (void)updateCellSubviews:(NSNotification*)notification
+{
+	NSClipView *clipView = notification.object;
+	
+	// determine cells in visible rect
+	// -------------------------------
+	NSRect visibleRect = self.enclosingScrollView.documentVisibleRect;
+	NSPoint visibleRectDiagonalPoint = NSMakePoint(visibleRect.origin.x + visibleRect.size.width,
+												   visibleRect.origin.y + visibleRect.size.height);
+	
+	NSUInteger minCol = [self columnAtPoint:visibleRect.origin];
+	NSUInteger maxCol = [self columnAtPoint:visibleRectDiagonalPoint];
+	NSUInteger minRow = [self rowAtPoint:visibleRect.origin];
+	NSUInteger maxRow = [self rowAtPoint:visibleRectDiagonalPoint];
+	
+	NSAssert(minCol != NSNotFound, @"minCol not found");
+	NSAssert(maxCol != NSNotFound, @"maxCol not found");
+	NSAssert(minRow != NSNotFound, @"minRow not found");
+	NSAssert(maxRow != NSNotFound, @"maxRow not found");
+
+	NSMutableArray *stackViewsAvailableForReuse = [NSMutableArray array];
+	
+	// remove NSStackViews that are no longer visible
+	// ----------------------------------------------
+	for (DMStackView *stackView in self.stackViewForColumn.allValues) {
+		if (stackView.column < minCol || stackView.column > maxCol) {
+			
+			// stack view is no longer visible
+			//
+			stackView.visible = NO;
+			stackView.hidden = YES;
+			[stackViewsAvailableForReuse addObject:stackView];
+		}
+	}
+	
+	// determine which cells are visible, which are becoming visible now, and which are being moved out of view
+	// --------------------------------------------------------------------------------------------------------
+	NSArray *oldVisibleIndexPaths = self.visibleCells.allKeys; // save current index paths of visible cells
+
+	// build list of current visible index paths
+	NSMutableArray *newVisibleIndexPaths = [NSMutableArray array];
+	for (NSUInteger col=minCol; col < maxCol+1; col++)
+	{
+		for (int row=minRow; row < maxRow+1; row++) {
+			NSUInteger indices[] = {col, row};
+			NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
+			[newVisibleIndexPaths addObject:indexPath];
+		}
+	}
+
+	// determine which index paths were visible and are no longer
+	//NSMutableArray *indexPathsToRemove = [NSMutableArray arrayWithArray:oldVisibleIndexPaths];
+	//[indexPathsToRemove removeObjectsInArray:newVisibleIndexPaths];
+	
+	// determine which index paths are just now becoming visible
+	//NSMutableArray *indexPathsToAdd = [NSMutableArray arrayWithArray:newVisibleIndexPaths];
+	//[indexPathsToAdd removeObjectsInArray:oldVisibleIndexPaths];
+
+	// iterate over all visible columns
+	// --------------------------------
+	for (NSUInteger colNumber=minCol; colNumber <= maxCol; colNumber++) {
+		
+		DMStackView *stackView = self.stackViewForColumn[@(colNumber)];
+		if (stackView == nil) {
+			if (stackViewsAvailableForReuse.count > 0) {
+				// get one from the queue
+				//
+				stackView = stackViewsAvailableForReuse.lastObject;
+				[stackViewsAvailableForReuse removeLastObject];
+				stackView.hidden = NO;
+				stackView.visible = YES;
+				stackView.column = colNumber;
+				
+				// make any cells in the view available for reuse
+				while (stackView.subviews.count > 0) {
+					NSView *subview = stackView.subviews.firstObject;
+					[subview removeFromSuperview];
+					[_tableGrid enqueueView:subview forIdentifier:subview.identifier];
+				}
+			} else {
+				// no stack views available for reuse; make a new one
+				//
+				stackView = [[DMStackView alloc] initWithFrame:NSMakeRect(0, 0, 100, 100)]; // arbitrary frame
+				stackView.translatesAutoresizingMaskIntoConstraints = NO;
+				stackView.orientation = NSUserInterfaceLayoutOrientationVertical;
+				stackView.spacing = 1.0f;
+				stackView.column = colNumber;
+
+				self.stackViewForColumn[@(colNumber)] = stackView;
+				
+				// have the stackView strongly hug the sides of the views it contains
+				[stackView setHuggingPriority:NSLayoutPriorityDefaultHigh forOrientation:NSLayoutConstraintOrientationHorizontal];
+			
+
+				NSDictionary *views = NSDictionaryOfVariableBindings(stackView);
+				[self addSubview:stackView];
+				[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[stackView]|"
+																			 options:0
+																			 metrics:nil
+																			   views:views]];
+				
+				//stackView.spacerView = [[NSView alloc] initWithFrame:NSMakeRect(0,0,100,100)];
+				//[stackView addView:stackView.spacerView inGravity:NSStackViewGravityTop];
+				stackView.rowsInStack = NSMakeRange(0, 0);
+			}
+		}
+		
+		// set up constraints for this stack view
+		// --------------------------------------
+		NSRect cellFrame = [self frameOfCellAtColumn:colNumber row:0]; // for position of column
+		NSView *debugViewCell = stackView.subviews.firstObject;
+		if (stackView.widthConstraint == nil) {
+			// if newly created
+			stackView.widthConstraint = [NSLayoutConstraint constraintWithItem:stackView
+																	 attribute:NSLayoutAttributeWidth
+																	 relatedBy:NSLayoutRelationEqual
+																		toItem:nil
+																	 attribute:NSLayoutAttributeNotAnAttribute
+																	multiplier:1.0f
+																	  constant:0.0f]; // set below
+			[stackView addConstraints:@[stackView.widthConstraint]];
+		}
+		stackView.widthConstraint.constant = cellFrame.size.width;
+		
+		if (stackView.leftConstraint == nil) {
+			stackView.leftConstraint = [NSLayoutConstraint constraintWithItem:self
+																	attribute:NSLayoutAttributeLeft
+																	relatedBy:NSLayoutRelationEqual
+																	   toItem:stackView
+																	attribute:NSLayoutAttributeLeft
+																   multiplier:1.0f
+																	 constant:0.0f]; // set below
+			[self addConstraints:@[stackView.leftConstraint]];
+		}
+		stackView.leftConstraint.constant = cellFrame.origin.x + colNumber * self.gridLineThickness;
+		
+		// handle cells (rows)
+		// -------------------
+		if (NSEqualRanges(stackView.rowsInStack, NSMakeRange(minRow, maxRow-minRow))) // start, length
+			continue; // no changes to rows in stackView
+		
+		stackView.edgeInsets = NSEdgeInsetsMake(cellFrame.size.height * minRow + (minRow * self.gridLineThickness),
+												0.0f, 0.0f, 0.0f); // top, left, bottom, right
+
+		NSRange newRowRange = NSMakeRange(minRow, maxRow-minRow);
+		NSRange intersectionRange = NSIntersectionRange(stackView.rowsInStack, newRowRange);
+		
+		// There are three possiblities:
+		//	- [A] new range and old range don't intersect - replace all cells
+		//	- [B] ranges overlap, new cells are needed above
+		//	- [C] ranges overlap, new cells are needed below
+		// -- range lengths don't match ?
+		
+		if (intersectionRange.length == 0) {
+			// [A] ranges don't intersect, remove all cells
+			while (stackView.views.count)
+				[stackView removeView:stackView.subviews.lastObject];
+			//stackView.rowsInStack = NSMakeRange(0, 0);
+			
+			// add cells requested
+			//
+			for (NSUInteger row=minRow; row < maxRow+1; row++) {
+				
+				// get cell
+				NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
+										   viewForTableColumn:colNumber
+													   andRow:row];
+				view.translatesAutoresizingMaskIntoConstraints = NO;
+				
+				// fix height of cell view
+				[view addConstraint:[NSLayoutConstraint constraintWithItem:view
+																 attribute:NSLayoutAttributeHeight
+																 relatedBy:NSLayoutRelationEqual
+																	toItem:nil
+																 attribute:NSLayoutAttributeNotAnAttribute
+																multiplier:1.0f
+																  constant:cellFrame.size.height]];
+				
+				[stackView addView:view inGravity:NSStackViewGravityTop];
+			}
+			stackView.rowsInStack = NSMakeRange(minRow, maxRow+1);
+		}
+		else {
+			// ranges intersect - take advantage of fact that the ranges are contiguous
+			//
+			// new cells above or below?
+			if (newRowRange.location < stackView.rowsInStack.location) {
+				// [B] new cells above
+				//
+				//  -- remove cells below outside of range
+				while (stackView.rowsInStack.location + stackView.rowsInStack.length > maxRow) { // check math!
+					[stackView removeView:stackView.views.lastObject];
+					stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location, stackView.rowsInStack.length - 1);
+				}
+				//  -- insert new cells above
+				while (stackView.rowsInStack.location > newRowRange.location) {
+					
+					NSUInteger row = stackView.rowsInStack.location - 1;
+					
+					// get cell
+					NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
+											   viewForTableColumn:colNumber
+														   andRow:row];
+					view.translatesAutoresizingMaskIntoConstraints = NO;
+					
+					[stackView insertView:view atIndex:0 inGravity:NSStackViewGravityTop];
+					
+					stackView.rowsInStack = NSMakeRange(row, stackView.rowsInStack.length+1);
+				}
+			} else {
+				// [C] new cells below
+				//
+				//  -- remove cells above outside of range
+				while (stackView.rowsInStack.location > newRowRange.location) {
+					[stackView removeView:stackView.views.firstObject];
+					stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location+1, stackView.rowsInStack.length - 1);
+				}
+				//  -- insert new cells below
+				while (stackView.rowsInStack.length + stackView.rowsInStack.location < newRowRange.location + newRowRange.length) {
+					
+					NSUInteger row = stackView.rowsInStack.location + stackView.rowsInStack.length;
+					
+					// get cell
+					NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
+											   viewForTableColumn:colNumber
+														   andRow:row];
+					view.translatesAutoresizingMaskIntoConstraints = NO;
+					
+					[stackView addView:view inGravity:NSStackViewGravityTop];
+					
+					stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location, stackView.rowsInStack.length + 1);
+				}
+			}
+		}
+		
+
+	} // end loop over visible columns
+	
+	self.needsLayout = YES;
+}
+
 // ------------------------------------------------------------------
-- (void)layout
+- (void)layout2
 {
 	// Note: "layout" will only be called if auto layout is turned on
 	//		 OR wantsUpdateLayer returns YES.
@@ -1209,7 +1472,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSAssert(minRow != NSNotFound, @"minRow not found");
 	NSAssert(maxRow != NSNotFound, @"maxRow not found");
 	
-	NSArray *oldVisibleIndexPaths = self.visibleCells.allKeys; // save current index pathsof visible cells
+	NSArray *oldVisibleIndexPaths = self.visibleCells.allKeys; // save current index paths of visible cells
 
 	// build list of current visible index paths
 	NSMutableArray *newVisibleIndexPaths = [NSMutableArray array];
@@ -1246,6 +1509,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	// Add new cells
 	//
 	for (NSIndexPath *indexPath in indexPathsToAdd) {
+		
 		NSUInteger column = [indexPath indexAtPosition:0];
 		NSUInteger row = [indexPath indexAtPosition:1];
 		NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
@@ -1254,31 +1518,38 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		view.translatesAutoresizingMaskIntoConstraints = NO;
 		
 		NSRect cellFrame = [self frameOfCellAtColumn:column row:row];
-		if (view.superview == nil) {
+
+		NSLayoutConstraint *horizontalConstraint, *verticalConstraint;
+		
+		if (view.superview == nil)
 			[self addSubview:view];
-			
-			NSDictionary *d = NSDictionaryOfVariableBindings(view);
-			NSLayoutConstraint *verticalConstraint = [NSLayoutConstraint constraintWithItem:view
-																				  attribute:NSLayoutAttributeTop
-																				  relatedBy:NSLayoutRelationEqual
-																					 toItem:self
-																				  attribute:NSLayoutAttributeTop
-																				 multiplier:1.0f
-																				   constant:cellFrame.origin.y];
-			NSLayoutConstraint *verticalConstraint = [NSLayoutConstraint constraintWithItem:view
-																				  attribute:NSLayoutAttributeTop
-																				  relatedBy:NSLayoutRelationEqual
-																					 toItem:self
-																				  attribute:NSLayoutAttributeTop
-																				 multiplier:1.0f
-																				   constant:cellFrame.origin.y];
-			verticalConstraint.active = YES;
-		}
 		else
 			view.hidden = NO;
+
+		view.frame = cellFrame;
 		
-		self.visibleCells[indexPath] = view;
+		/*
+		verticalConstraint = [NSLayoutConstraint constraintWithItem:view
+														  attribute:NSLayoutAttributeTop
+														  relatedBy:NSLayoutRelationEqual
+															 toItem:self
+														  attribute:NSLayoutAttributeTop
+														 multiplier:1.0f
+														   constant:cellFrame.origin.y];
+		horizontalConstraint = [NSLayoutConstraint constraintWithItem:view
+															attribute:NSLayoutAttributeLeading
+															relatedBy:NSLayoutRelationEqual
+															   toItem:self
+															attribute:NSLayoutAttributeLeft
+														   multiplier:1.0f
+															 constant:cellFrame.origin.x];
+		//verticalConstraint.active = YES;
 		
+		self.visibleCells[indexPath] = @{@"view":view,
+										 kTOP_CONSTRAINT:verticalConstraint,
+										 kLEFT_CONSTRAINT:horizontalConstraint};
+		 */
+
 		// handle selection
 	}
 	
@@ -1652,8 +1923,16 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
 {
-	if (object == self.superview) { // clip view
-		NSLog(@" changed");
+	if (object == self) {
+		if ([keyPath isEqualToString:@"bounds"]) {
+			NSLog(@"content view bounds changed");
+		}
+		else if ([keyPath isEqualToString:@"frame"]) {
+			NSLog(@"content view frame changed");
+		}
+	}
+	else if (object == self.superview) { // clip view
+		NSLog(@"clip view frame changed");
 		if ([keyPath isEqualToString:@"frame"]) {
 			// the amount of view prefetching seems to depend on the window bounds; reset when those change
 			CGFloat pad = 3.0;
@@ -1663,6 +1942,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			scrollPrefetchNegY = self.bounds.size.height * pad;
 		}
 	}
+	else
+		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 @end
