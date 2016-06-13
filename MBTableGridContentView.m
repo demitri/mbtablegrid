@@ -1222,7 +1222,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)updateCellSubviews:(NSNotification*)notification
 {
-	NSLog(@"self.bounds: %@", NSStringFromRect(self.bounds));
+	//NSLog(@"self.bounds: %@", NSStringFromRect(self.bounds));
 	NSClipView *clipView = notification.object;
 	
 	// determine cells in visible rect
@@ -1323,7 +1323,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				
 				// have the stackView strongly hug the sides of the views it contains
 				[stackView setHuggingPriority:NSLayoutPriorityDefaultHigh forOrientation:NSLayoutConstraintOrientationHorizontal];
-			
+				[stackView setClippingResistancePriority:NSLayoutPriorityRequired forOrientation:NSTextLayoutOrientationVertical];
 
 				NSDictionary *views = NSDictionaryOfVariableBindings(stackView);
 				[self addSubview:stackView];
@@ -1352,6 +1352,16 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 																	multiplier:1.0f
 																	  constant:0.0f]; // set below
 			[stackView addConstraints:@[stackView.widthConstraint]];
+			
+			NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:stackView
+																				attribute:NSLayoutAttributeHeight
+																				relatedBy:NSLayoutRelationEqual
+																				   toItem:self
+																				attribute:NSLayoutAttributeHeight
+																			   multiplier:1.0f
+																				 constant:0.0f];
+			heightConstraint.priority = NSLayoutPriorityDefaultHigh;
+			[self addConstraints:@[heightConstraint]];
 		}
 		stackView.widthConstraint.constant = cellFrame.size.width;
 		
@@ -1540,6 +1550,13 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			}
 			 */
 			needsLayout = YES;
+			
+			if (stackView.column == 0) {
+				// log shows ranges always agree (but the results are incorrect)
+				// log is also showing that the stack view is detaching all its views as the height goes to zero
+				// the height should not be changing - I create specific constriants to keep it as tall as the document view (self)
+				NSLog(@"%@, %@ (%@) %d %d", NSStringFromRange(newRowRange), NSStringFromRange(stackView.rowsInStack), [[[[stackView.subviews objectAtIndex:0] subviews] objectAtIndex:0] stringValue], (int)stackView.bounds.size.height, stackView.detachedViews.count);
+			}
 		}
 		
 

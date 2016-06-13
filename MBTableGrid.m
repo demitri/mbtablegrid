@@ -158,9 +158,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 		// Setup the row headers
 		// ---------------------
-		NSRect rowHeaderFrame = NSMakeRect(0, MBTableGridColumnHeaderHeight, MBTableGridRowHeaderWidth, [self frame].size.height - MBTableGridColumnHeaderHeight * 2);
+		NSRect rowHeaderFrame = NSMakeRect(0, MBTableGridColumnHeaderHeight, MBTableGridRowHeaderWidth, self.frame.size.height - MBTableGridColumnHeaderHeight * 2);
 		rowHeaderScrollView = [[NSScrollView alloc] initWithFrame:rowHeaderFrame];
-//		rowHeaderScrollView = [[JNWScrollView alloc] initWithFrame:rowHeaderFrame];
 		rowHeaderScrollView.wantsLayer = YES;
 		rowHeaderScrollView.horizontalScrollElasticity = NO;
 		rowHeaderScrollView.verticalScrollElasticity = NO;
@@ -176,10 +175,12 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		
 		// Setup the footer view
 		// ---------------------
-		NSRect columnFooterFrame = NSMakeRect(MBTableGridRowHeaderWidth, frameRect.size.height - MBTableGridColumnHeaderHeight, frameRect.size.width - MBTableGridRowHeaderWidth, MBTableGridColumnHeaderHeight);
+		NSRect columnFooterFrame = NSMakeRect(MBTableGridRowHeaderWidth,
+											  frameRect.size.height - MBTableGridColumnHeaderHeight,
+											  frameRect.size.width - MBTableGridRowHeaderWidth,
+											  MBTableGridColumnHeaderHeight);
 		
 		columnFooterScrollView = [[NSScrollView alloc] initWithFrame:columnFooterFrame];
-//		columnFooterScrollView = [[JNWScrollView alloc] initWithFrame:columnFooterFrame];
 		columnFooterScrollView.wantsLayer = YES;
 		columnFooterScrollView.horizontalScrollElasticity = NO;
 		columnFooterScrollView.verticalScrollElasticity = NO;
