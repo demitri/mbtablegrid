@@ -80,7 +80,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 @end
 
 @interface MBTableGrid (PrivateAccessors)
-- (MBTableGridContentView *)_contentView;
+//- (MBTableGridContentView *)_contentView;
 - (void)_setStickyColumn:(MBTableGridEdge)stickyColumn row:(MBTableGridEdge)stickyRow;
 - (MBTableGridEdge)_stickyColumn;
 - (MBTableGridEdge)_stickyRow;
@@ -200,15 +200,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 										 self.frame.size.width - MBTableGridRowHeaderWidth,
 										 self.frame.size.height - MBTableGridColumnHeaderHeight - MBTableGridColumnHeaderHeight);
 		contentScrollView = [[NSScrollView alloc] initWithFrame:contentFrame];
-//		contentScrollView = [[JNWScrollView alloc] initWithFrame:contentFrame];
 		contentScrollView.wantsLayer = YES;
-		contentView = [[MBTableGridContentView alloc] initWithFrame:NSMakeRect(0, 0, contentFrame.size.width, contentFrame.size.height)
+		self.contentView = [[MBTableGridContentView alloc] initWithFrame:NSMakeRect(0, 0, contentFrame.size.width, contentFrame.size.height)
 													   andTableGrid:self];
-		contentView.wantsLayer = YES;
-		contentView.autoresizesSubviews = NO; // [dm]
+		self.contentView.wantsLayer = YES;
+		self.contentView.autoresizesSubviews = NO; // [dm]
 
-		contentScrollView.autoresizesSubviews = YES; // [dm]
-		contentScrollView.documentView = contentView;
+		//contentScrollView.autoresizesSubviews = YES; // [dm]
+		contentScrollView.documentView = self.contentView;
 		contentScrollView.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
 		contentScrollView.hasHorizontalScroller = YES;
 		contentScrollView.hasVerticalScroller = YES;
@@ -352,7 +351,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	// Update views with new sizes
 	//[contentView setFrameSize:NSMakeSize(currentWidth, NSHeight(contentView.frame))];
 	//[columnHeaderView setFrameSize:NSMakeSize(currentWidth, NSHeight(columnHeaderView.frame))];
-	contentView.needsDisplay = YES;
+	self.contentView.needsDisplay = YES;
 	columnHeaderView.needsDisplay = YES;
 	self.needsDisplay = YES;
 	[columnHeaderView setNeedsDisplayInRect:columnHeaderView.frame];
@@ -402,17 +401,17 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     }
     
     // Update views with new sizes
-    [contentView setFrameSize:NSMakeSize(NSWidth(contentView.frame) + distance, NSHeight(contentView.frame))];
+    [_contentView setFrameSize:NSMakeSize(NSWidth(_contentView.frame) + distance, NSHeight(_contentView.frame))];
     [columnHeaderView setFrameSize:NSMakeSize(NSWidth(columnHeaderView.frame) + distance, NSHeight(columnHeaderView.frame))];
     [columnFooterView setFrameSize:NSMakeSize(NSWidth(columnFooterView.frame) + distance, NSHeight(columnFooterView.frame))];
     
-    NSRect rectOfResizedAndVisibleRightwardColumns = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, contentView.bounds.size.width - columnRect.origin.x, NSHeight(contentView.frame));
-    [contentView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardColumns];
+    NSRect rectOfResizedAndVisibleRightwardColumns = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(_contentView.frame));
+    [_contentView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardColumns];
     
-    NSRect rectOfResizedAndVisibleRightwardHeaders = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, contentView.bounds.size.width - columnRect.origin.x, NSHeight(columnHeaderView.frame));
+    NSRect rectOfResizedAndVisibleRightwardHeaders = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(columnHeaderView.frame));
     [columnHeaderView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardHeaders];
     
-    NSRect rectOfResizedAndVisibleRightwardFooters = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, contentView.bounds.size.width - columnRect.origin.x, NSHeight(columnFooterView.frame));
+    NSRect rectOfResizedAndVisibleRightwardFooters = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(columnFooterView.frame));
     [columnFooterView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardFooters];
     
     return offset;
@@ -430,14 +429,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	[super registerForDraggedTypes:types];
 
 	// Register the content view for everything
-	[contentView registerForDraggedTypes:types];
+	[_contentView registerForDraggedTypes:types];
 }
 
 #pragma mark Mouse Events
 
 - (void)mouseDown:(NSEvent *)theEvent {
 	// End editing (if necessary)
-	[[self cell] endEditing:[[self window] fieldEditor:NO forObject:contentView]];
+	[self.cell endEditing:[self.window fieldEditor:NO forObject:_contentView]];
 
 	// If we're not the first responder, we need to be
 	if ([[self window] firstResponder] != self) {
@@ -874,16 +873,16 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	NSCell *selectedCell = [self _cellForColumn:column];
 	
 	if (![selectedCell isKindOfClass:[MBImageCell class]]) {
-		[contentView editSelectedCell:self text:aString];
+		[_contentView editSelectedCell:self text:aString];
 		
 		if ([selectedCell isKindOfClass:[MBTableGridCell class]]) {
 			// Insert the typed string into the field editor
-			NSText *fieldEditor = [[self window] fieldEditor:YES forObject:contentView];
-			fieldEditor.delegate = contentView;
+			NSText *fieldEditor = [self.window fieldEditor:YES forObject:_contentView];
+			fieldEditor.delegate = _contentView;
 			[fieldEditor setString:aString];
             
             // The textDidBeginEditing notification isn't sent yet, so invoke a custom method
-            [contentView textDidBeginEditingWithEditor:fieldEditor];
+            [_contentView textDidBeginEditingWithEditor:fieldEditor];
 		}
 		
 	} else {
@@ -920,7 +919,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
         [scrollView reflectScrolledClipView:scrollView.contentView];
     }
 
-	[contentView setNeedsDisplayInRect:contentView.visibleRect];
+	[_contentView setNeedsDisplayInRect:_contentView.visibleRect];
 }
 
 - (void)columnHeaderViewDidScroll:(NSNotification *)aNotification {
@@ -1012,8 +1011,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 			// If the drag is okay, highlight the appropriate cell
 			if (dragOperation != NSDragOperationNone) {
-				[contentView _setDropColumn:dropColumn];
-				[contentView _setDropRow:dropRow];
+				[_contentView _setDropColumn:dropColumn];
+				[_contentView _setDropRow:dropRow];
 			}
 
 			return dragOperation;
@@ -1045,14 +1044,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 			canDrop = [self.dataSource tableGrid:self canMoveColumns:draggedColumns toIndex:dropColumn];
 		}
 
-		[contentView _setDraggingColumnOrRow:YES];
+		[_contentView _setDraggingColumnOrRow:YES];
 
 		if (canDrop) {
-			[contentView _setDropColumn:dropColumn];
+			[_contentView _setDropColumn:dropColumn];
 			return NSDragOperationMove;
 		}
 		else {
-			[contentView _setDropColumn:NSNotFound];
+			[_contentView _setDropColumn:NSNotFound];
 		}
 	}
 	else if (rowData) {
@@ -1071,14 +1070,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 			canDrop = [self.dataSource tableGrid:self canMoveRows:draggedRows toIndex:dropRow];
 		}
 
-		[contentView _setDraggingColumnOrRow:YES];
+		[_contentView _setDraggingColumnOrRow:YES];
 
 		if (canDrop) {
-			[contentView _setDropRow:dropRow];
+			[_contentView _setDropRow:dropRow];
 			return NSDragOperationMove;
 		}
 		else {
-			[contentView _setDropRow:NSNotFound];
+			[_contentView _setDropRow:NSNotFound];
 		}
 	}
 	else {
@@ -1086,14 +1085,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 			NSUInteger dropColumn = [self columnAtPoint:mouseLocation];
 			NSUInteger dropRow = [self rowAtPoint:mouseLocation];
 
-			[contentView _setDraggingColumnOrRow:NO];
+			[_contentView _setDraggingColumnOrRow:NO];
 
 			NSDragOperation dragOperation = [self.dataSource tableGrid:self validateDrop:sender proposedColumn:dropColumn row:dropRow];
 
 			// If the drag is okay, highlight the appropriate cell
 			if (dragOperation != NSDragOperationNone) {
-				[contentView _setDropColumn:dropColumn];
-				[contentView _setDropRow:dropRow];
+				[_contentView _setDropColumn:dropColumn];
+				[_contentView _setDropRow:dropRow];
 			}
 
 			return dragOperation;
@@ -1103,13 +1102,13 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (void)draggingExited:(id <NSDraggingInfo> )sender {
-	[contentView _setDropColumn:NSNotFound];
-	[contentView _setDropRow:NSNotFound];
+	[_contentView _setDropColumn:NSNotFound];
+	[_contentView _setDropRow:NSNotFound];
 }
 
 - (void)draggingEnded:(id <NSDraggingInfo> )sender {
-	[contentView _setDropColumn:NSNotFound];
-	[contentView _setDropRow:NSNotFound];
+	[_contentView _setDropColumn:NSNotFound];
+	[_contentView _setDropRow:NSNotFound];
 }
 
 - (BOOL)prepareForDragOperation:(id <NSDraggingInfo> )sender {
@@ -1211,8 +1210,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (void)concludeDragOperation:(id <NSDraggingInfo> )sender {
-	[contentView _setDropColumn:NSNotFound];
-	[contentView _setDropRow:NSNotFound];
+	[_contentView _setDropColumn:NSNotFound];
+	[_contentView _setDropRow:NSNotFound];
 }
 
 #pragma mark -
@@ -1233,7 +1232,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (void)reloadData {
-	CGRect visibleRect = [contentScrollView contentView].documentVisibleRect;
+	CGRect visibleRect = contentScrollView.contentView.documentVisibleRect;
 	
 	// Set number of columns
 	if ([self.dataSource respondsToSelector:@selector(numberOfColumnsInTableGrid:)]) {
@@ -1256,10 +1255,11 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	// Update the content view's size
     NSUInteger lastColumn = (_numberOfColumns>0) ? _numberOfColumns-1 : 0;
     NSUInteger lastRow = (_numberOfRows>0) ? _numberOfRows-1 : 0;
-	NSRect bottomRightCellFrame = [contentView frameOfCellAtColumn:lastColumn row:lastRow];
+	NSRect bottomRightCellFrame = [_contentView frameOfCellAtColumn:lastColumn row:lastRow];
 
-	NSRect contentRect = NSMakeRect([contentView frame].origin.x, [contentView frame].origin.y, NSMaxX(bottomRightCellFrame), NSMaxY(bottomRightCellFrame));
-	[contentView setFrameSize:contentRect.size];
+	NSRect contentRect = NSMakeRect(_contentView.frame.origin.x, _contentView.frame.origin.y,
+									NSMaxX(bottomRightCellFrame), NSMaxY(bottomRightCellFrame));
+	[_contentView setFrameSize:contentRect.size];
 
 	// Update the column header view's size
 	NSRect columnHeaderFrame = [columnHeaderView frame];
@@ -1295,7 +1295,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	[self scrollToArea:visibleRect animate:NO];
 
 	[self setNeedsDisplay:YES];
-	[self._contentView setNeedsDisplay:YES];
+	[self.contentView setNeedsDisplay:YES];
 	[self.columnHeaderView setNeedsDisplay:YES];
 	[self.rowHeaderView setNeedsDisplay:YES];
 }
@@ -1303,7 +1303,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 #pragma mark Layout Support
 
 - (NSRect)rectOfColumn:(NSUInteger)columnIndex {
-	NSRect rect = [self convertRect:[contentView rectOfColumn:columnIndex] fromView:contentView];
+	NSRect rect = [self convertRect:[_contentView rectOfColumn:columnIndex] fromView:_contentView];
 	rect.origin.y = 0;
 	rect.size.height += MBTableGridColumnHeaderHeight;
 	if (rect.size.height > [self frame].size.height) {
@@ -1319,7 +1319,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (NSRect)rectOfRow:(NSUInteger)rowIndex {
-	NSRect rect = [self convertRect:[contentView rectOfRow:rowIndex] fromView:contentView];
+	NSRect rect = [self convertRect:[_contentView rectOfRow:rowIndex] fromView:_contentView];
 	rect.origin.x = 0;
 	rect.size.width += MBTableGridRowHeaderWidth;
 
@@ -1327,7 +1327,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (NSRect)frameOfCellAtColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex {
-	return [self convertRect:[contentView frameOfCellAtColumn:columnIndex row:rowIndex] fromView:contentView];
+	return [self convertRect:[_contentView frameOfCellAtColumn:columnIndex row:rowIndex] fromView:_contentView];
 }
 
 - (NSRect)headerRectOfColumn:(NSUInteger)columnIndex {
@@ -1381,7 +1381,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (MBTableGridContentView *)contentView {
-	return contentView;
+	return _contentView;
 }
 
 #pragma mark - Overridden Property Accessors
@@ -1402,7 +1402,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	selectedColumnIndexes = anIndexSet;
 
 	[self setNeedsDisplay:YES];
-	[self._contentView setNeedsDisplay:YES];
+	[self.contentView setNeedsDisplay:YES];
 	[self.columnHeaderView setNeedsDisplay:YES];
 	[self.rowHeaderView setNeedsDisplay:YES];
 
@@ -1425,7 +1425,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	selectedRowIndexes = anIndexSet;
 
 	[self setNeedsDisplay:YES];
-	[self._contentView setNeedsDisplay:YES];
+	[self.contentView setNeedsDisplay:YES];
 	[self.columnHeaderView setNeedsDisplay:YES];
 	[self.rowHeaderView setNeedsDisplay:YES];
 	
@@ -1648,9 +1648,9 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 @implementation MBTableGrid (PrivateAccessors)
 
-- (MBTableGridContentView *)_contentView {
-	return contentView;
-}
+//- (MBTableGridContentView *)_contentView {
+//	return contentView;
+//}
 
 - (void)_setStickyColumn:(MBTableGridEdge)stickyColumn row:(MBTableGridEdge)stickyRow {
 	stickyColumnEdge = stickyColumn;

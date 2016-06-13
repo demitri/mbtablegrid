@@ -768,10 +768,10 @@ NSString * const ColumnText4 = @"text4";
 - (NSView*)tableGrid:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row
 {
 	NSTableCellView *view = [self.tableGrid makeViewWithIdentifier:@"BasicCellView" owner:self];
-	//view.translatesAutoresizingMaskIntoConstraints = NO;
-	view.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
-	view.textField.stringValue = [NSString stringWithFormat:@"%d", arc4random_uniform(42)];
-//	view.textField.stringValue = [NSString stringWithFormat:@"%lu x %lu", (unsigned long)columnIndex, (unsigned long)row];
+	view.translatesAutoresizingMaskIntoConstraints = NO;
+	//view.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
+//	view.textField.stringValue = [NSString stringWithFormat:@"%d", arc4random_uniform(42)];
+	view.textField.stringValue = [NSString stringWithFormat:@"[%lu x %lu]", columnIndex, row+1];
 	view.canDrawSubviewsIntoLayer = YES;
 	return view;
 }

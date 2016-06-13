@@ -172,6 +172,10 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			   forKeyPath:@"bounds"
 				  options:NSKeyValueObservingOptionNew
 				  context:nil];
+		[self addObserver:self
+			   forKeyPath:@"frame"
+				  options:NSKeyValueObservingOptionNew
+				  context:nil];
 	}
 	return self;
 }
@@ -1178,6 +1182,18 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 #pragma mark -
 #pragma mark [dm] Layout methods
 
+- (void)resizeWithOldSuperviewSize:(NSSize)oldSize {};
+
+- (void)setFrame:(NSRect)frame
+{
+	[super setFrame:frame];
+}
+
+- (void)setBounds:(NSRect)bounds
+{
+	[super setBounds:bounds];
+}
+
 - (void)resetDocumentView
 {
 	// Reset document (this class) size.
@@ -1206,6 +1222,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)updateCellSubviews:(NSNotification*)notification
 {
+	NSLog(@"self.bounds: %@", NSStringFromRect(self.bounds));
 	NSClipView *clipView = notification.object;
 	
 	// determine cells in visible rect
@@ -1219,6 +1236,13 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSUInteger minRow = [self rowAtPoint:visibleRect.origin];
 	NSUInteger maxRow = [self rowAtPoint:visibleRectDiagonalPoint];
 	
+	CGFloat cellWidth = 60.0f;
+	CGFloat cellHeight = 20.0f;
+	maxCol = ceilf(NSMaxX(visibleRect) / (self.gridLineThickness + cellWidth));
+	minCol = floorf(NSMinX(visibleRect) / (self.gridLineThickness + cellWidth));
+	maxRow = ceilf(NSMaxY(visibleRect) / (self.gridLineThickness + cellHeight));
+	minRow = floorf(visibleRect.origin.y / (self.gridLineThickness + cellHeight));
+					
 	NSAssert(minCol != NSNotFound, @"minCol not found");
 	NSAssert(maxCol != NSNotFound, @"maxCol not found");
 	NSAssert(minRow != NSNotFound, @"minRow not found");
@@ -1264,6 +1288,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 	// iterate over all visible columns
 	// --------------------------------
+	BOOL needsLayout = NO;
 	for (NSUInteger colNumber=minCol; colNumber <= maxCol; colNumber++) {
 		
 		DMStackView *stackView = self.stackViewForColumn[@(colNumber)];
@@ -1329,10 +1354,10 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		stackView.widthConstraint.constant = cellFrame.size.width;
 		
 		if (stackView.leftConstraint == nil) {
-			stackView.leftConstraint = [NSLayoutConstraint constraintWithItem:self
+			stackView.leftConstraint = [NSLayoutConstraint constraintWithItem:stackView
 																	attribute:NSLayoutAttributeLeft
 																	relatedBy:NSLayoutRelationEqual
-																	   toItem:stackView
+																	   toItem:self
 																	attribute:NSLayoutAttributeLeft
 																   multiplier:1.0f
 																	 constant:0.0f]; // set below
@@ -1355,9 +1380,13 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		//	- [A] new range and old range don't intersect - replace all cells
 		//	- [B] ranges overlap, new cells are needed above
 		//	- [C] ranges overlap, new cells are needed below
+		//  - [D] ranges are equal, no update needed
 		// -- range lengths don't match ?
 		
-		if (intersectionRange.length == 0) {
+		if (NSEqualRanges(stackView.rowsInStack, newRowRange)) {
+			; // [D] no action needed
+		}
+		else if (intersectionRange.length == 0) {
 			// [A] ranges don't intersect, remove all cells
 			while (stackView.views.count)
 				[stackView removeView:stackView.subviews.lastObject];
@@ -1385,12 +1414,82 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				[stackView addView:view inGravity:NSStackViewGravityTop];
 			}
 			stackView.rowsInStack = NSMakeRange(minRow, maxRow+1);
+			needsLayout = YES;
 		}
 		else {
 			// ranges intersect - take advantage of fact that the ranges are contiguous
 			//
 			// new cells above or below?
-			if (newRowRange.location < stackView.rowsInStack.location) {
+			
+			// any cells to remove above new range?
+			//
+			while (stackView.rowsInStack.location < newRowRange.location) {
+				NSView *view = stackView.subviews.firstObject;
+				view.hidden = YES;
+				[stackView removeView:view];
+				[_tableGrid enqueueView:view forIdentifier:view.identifier];
+				stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location + 1, stackView.rowsInStack.length - 1);
+			}
+			
+			// any cells to remove below new range?
+			//
+			while (stackView.rowsInStack.location + stackView.rowsInStack.length > newRowRange.location + newRowRange.length) {
+				NSView *view = stackView.subviews.lastObject;
+				view.hidden = YES;
+				[stackView removeView:view];
+				[_tableGrid enqueueView:view forIdentifier:view.identifier];
+				stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location, stackView.rowsInStack.length - 1);
+			}
+			
+			// new cells above current range?
+			//
+			while (stackView.rowsInStack.location > newRowRange.location) {
+				
+				NSUInteger row = stackView.rowsInStack.location - 1;
+				
+				// get cell
+				NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
+										   viewForTableColumn:colNumber
+													   andRow:row];
+				view.translatesAutoresizingMaskIntoConstraints = NO;
+				
+				[stackView insertView:view atIndex:0 inGravity:NSStackViewGravityTop];
+				
+				stackView.rowsInStack = NSMakeRange(row, stackView.rowsInStack.length+1);
+			}
+			
+			// new cells below current range?
+			//
+			while (stackView.rowsInStack.length + stackView.rowsInStack.location < newRowRange.location + newRowRange.length) {
+				
+				NSUInteger row = stackView.rowsInStack.location + stackView.rowsInStack.length + 1;
+				
+				// get cell
+				NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
+										   viewForTableColumn:colNumber
+													   andRow:row];
+				view.translatesAutoresizingMaskIntoConstraints = NO;
+				
+				[stackView addView:view inGravity:NSStackViewGravityTop];
+				
+				stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location, stackView.rowsInStack.length + 1);
+			}
+
+			/*
+			
+			BOOL newCellsAbove;
+			
+			if (newRowRange.location < stackView.rowsInStack.location)
+				newCellsAbove = YES;
+			else if (newRowRange.location+newRowRange.length > stackView.rowsInStack.location+stackView.rowsInStack.length)
+				newCellsAbove = NO;
+			else if (newRowRange.location == stackView.rowsInStack.location) {
+				newCellsAbove = NO; // TODO: handle case where new range is smaller than current range?
+			} else
+				NSAssert(FALSE, @"check case");
+			
+			//else if (newRowRange.location < stackView.rowsInStack.location) {
+			if (newCellsAbove) {
 				// [B] new cells above
 				//
 				//  -- remove cells below outside of range
@@ -1417,7 +1516,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				// [C] new cells below
 				//
 				//  -- remove cells above outside of range
-				while (stackView.rowsInStack.location > newRowRange.location) {
+				while (stackView.rowsInStack.location < newRowRange.location) {
 					[stackView removeView:stackView.views.firstObject];
 					stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location+1, stackView.rowsInStack.length - 1);
 				}
@@ -1437,12 +1536,14 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 					stackView.rowsInStack = NSMakeRange(stackView.rowsInStack.location, stackView.rowsInStack.length + 1);
 				}
 			}
+			 */
+			needsLayout = YES;
 		}
 		
 
 	} // end loop over visible columns
 	
-	self.needsLayout = YES;
+	self.needsLayout = needsLayout;
 }
 
 // ------------------------------------------------------------------

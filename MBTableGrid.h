@@ -26,8 +26,9 @@
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
 #import "DMTableGridCellQueue.h"
+#import "MBTableGridContentView.h"
 
-@class MBTableGridHeaderView, MBTableGridFooterView, MBTableGridHeaderCell, MBTableGridContentView;
+@class MBTableGridHeaderView, MBTableGridFooterView, MBTableGridHeaderCell; //, MBTableGridContentView;
 @protocol MBTableGridDelegate, MBTableGridDataSource;
 
 /* Notifications */
@@ -125,7 +126,7 @@ typedef enum {
 	
 	/* Content */
 	NSScrollView *contentScrollView;
-	MBTableGridContentView *contentView;
+	//MBTableGridContentView *contentView;
 	
 	/* Selections */
 	NSIndexSet *selectedColumnIndexes;
@@ -145,6 +146,7 @@ typedef enum {
 
 @property (nonatomic, assign) BOOL showsGrabHandles;
 
+@property (nonatomic, strong) MBTableGridContentView *contentView;
 @property (nonatomic, readonly) MBTableGridHeaderView* columnHeaderView;
 @property (nonatomic, readonly) MBTableGridFooterView* columnFooterView;
 @property (nonatomic, readonly) MBTableGridHeaderView* rowHeaderView;

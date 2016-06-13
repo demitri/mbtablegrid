@@ -205,4 +205,6 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
  * @}
  */
 
+- (void)updateCellSubviews:(NSNotification*)notification;
+
 @end

@@ -197,7 +197,7 @@
 
 - (NSRect)footerRectOfColumn:(NSUInteger)columnIndex
 {
-	NSRect rect = [[self.tableGrid _contentView] rectOfColumn:columnIndex];
+	NSRect rect = [self.tableGrid.contentView rectOfColumn:columnIndex];
 	rect.size.height = MBTableGridColumnHeaderHeight;
 	
 	return rect;
@@ -205,7 +205,7 @@
 
 - (NSInteger)footerColumnAtPoint:(NSPoint)aPoint
 {
-    return [[self.tableGrid _contentView] columnAtPoint:aPoint];
+    return [self.tableGrid.contentView columnAtPoint:aPoint];
 }
 
 @end

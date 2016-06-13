@@ -191,7 +191,7 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 		NSUInteger numberOfRows = self.tableGrid.numberOfRows;
 		[headerCell setOrientation:self.orientation];
 
-		CGFloat rowHeight = [self.tableGrid _contentView].rowHeight;
+		CGFloat rowHeight = self.tableGrid.contentView.rowHeight;
 		NSUInteger row = MAX(0, floor(rect.origin.y / rowHeight));
 		NSUInteger endRow = MIN(numberOfRows, ceil((rect.origin.y + rect.size.height) / rowHeight));
 
@@ -467,7 +467,7 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 
 - (NSRect)headerRectOfColumn:(NSUInteger)columnIndex
 {
-	NSRect rect = [self.tableGrid._contentView rectOfColumn:columnIndex];
+	NSRect rect = [self.tableGrid.contentView rectOfColumn:columnIndex];
 	rect.size.height = MBTableGridColumnHeaderHeight;
 	
 	return rect;
@@ -475,7 +475,7 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 
 - (NSRect)headerRectOfRow:(NSUInteger)rowIndex
 {
-	NSRect rect = [self.tableGrid._contentView rectOfRow:rowIndex];
+	NSRect rect = [self.tableGrid.contentView rectOfRow:rowIndex];
 	rect.size.width = MBTableGridRowHeaderWidth;
 	
 	return rect;
