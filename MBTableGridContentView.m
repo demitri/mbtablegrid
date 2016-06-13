@@ -1239,8 +1239,10 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	CGFloat cellWidth = 60.0f;
 	CGFloat cellHeight = 20.0f;
 	maxCol = ceilf(NSMaxX(visibleRect) / (self.gridLineThickness + cellWidth));
+	maxCol = MIN(maxCol, _tableGrid.numberOfColumns-1);
 	minCol = floorf(NSMinX(visibleRect) / (self.gridLineThickness + cellWidth));
 	maxRow = ceilf(NSMaxY(visibleRect) / (self.gridLineThickness + cellHeight));
+	maxRow = MIN(maxRow, _tableGrid.numberOfRows-1);
 	minRow = floorf(visibleRect.origin.y / (self.gridLineThickness + cellHeight));
 					
 	NSAssert(minCol != NSNotFound, @"minCol not found");
@@ -1413,7 +1415,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				
 				[stackView addView:view inGravity:NSStackViewGravityTop];
 			}
-			stackView.rowsInStack = NSMakeRange(minRow, maxRow+1);
+			stackView.rowsInStack = NSMakeRange(minRow, maxRow-minRow+1);
 			needsLayout = YES;
 		}
 		else {
@@ -1544,6 +1546,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	} // end loop over visible columns
 	
 	self.needsLayout = needsLayout;
+	[self.window layoutIfNeeded];
 }
 
 // ------------------------------------------------------------------
