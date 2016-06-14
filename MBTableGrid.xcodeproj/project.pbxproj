@@ -13,6 +13,8 @@
 		8D11072B0486CEB800E47090 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C165CFE840E0CC02AAC07 /* InfoPlist.strings */; };
 		8D11072D0486CEB800E47090 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; settings = {ATTRIBUTES = (); }; };
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
+		A65F4B1B1D10563900D039BD /* DMGridStackView.h in Headers */ = {isa = PBXBuildFile; fileRef = A65F4B191D10563900D039BD /* DMGridStackView.h */; };
+		A65F4B1C1D10563900D039BD /* DMGridStackView.m in Sources */ = {isa = PBXBuildFile; fileRef = A65F4B1A1D10563900D039BD /* DMGridStackView.m */; };
 		A6AF0B6B1CF4F33D0037CC70 /* MyTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B6A1CF4F33D0037CC70 /* MyTableCellView.m */; };
 		A6AF0B6C1CF4F3C20037CC70 /* MyTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B6A1CF4F33D0037CC70 /* MyTableCellView.m */; };
 		A6AF0B6F1CF56AC90037CC70 /* DMTableGridCellQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF0B6D1CF56AC90037CC70 /* DMTableGridCellQueue.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -75,6 +77,8 @@
 		6593B7411AA37B6200BE9726 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* MBTableGrid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MBTableGrid.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A65F4B191D10563900D039BD /* DMGridStackView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMGridStackView.h; sourceTree = "<group>"; };
+		A65F4B1A1D10563900D039BD /* DMGridStackView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMGridStackView.m; sourceTree = "<group>"; };
 		A6AF0B691CF4F33D0037CC70 /* MyTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTableCellView.h; sourceTree = "<group>"; };
 		A6AF0B6A1CF4F33D0037CC70 /* MyTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTableCellView.m; sourceTree = "<group>"; };
 		A6AF0B6D1CF56AC90037CC70 /* DMTableGridCellQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMTableGridCellQueue.h; sourceTree = "<group>"; };
@@ -156,6 +160,8 @@
 				C9412A5E0D8AE98C00E9E614 /* MBTableGridController.m */,
 				A6AF0B691CF4F33D0037CC70 /* MyTableCellView.h */,
 				A6AF0B6A1CF4F33D0037CC70 /* MyTableCellView.m */,
+				A65F4B191D10563900D039BD /* DMGridStackView.h */,
+				A65F4B1A1D10563900D039BD /* DMGridStackView.m */,
 			);
 			name = Classes;
 			sourceTree = "<group>";
@@ -305,6 +311,7 @@
 				E2E62BFA1781C53800F36275 /* MBTableGridHeaderCell.h in Headers */,
 				E2E62BF71781C53800F36275 /* MBTableGrid.h in Headers */,
 				A6AF0B7F1CFC9B3E0037CC70 /* DMActiveCellsCache.h in Headers */,
+				A65F4B1B1D10563900D039BD /* DMGridStackView.h in Headers */,
 				E2E62BF81781C53800F36275 /* MBTableGridContentView.h in Headers */,
 				E2E62BF91781C53800F36275 /* MBTableGridHeaderView.h in Headers */,
 				A6AF0B6F1CF56AC90037CC70 /* DMTableGridCellQueue.h in Headers */,
@@ -427,6 +434,7 @@
 				A6AF0B801CFC9B3E0037CC70 /* DMActiveCellsCache.m in Sources */,
 				E2E62BBC1781C37800F36275 /* MBTableGridHeaderView.m in Sources */,
 				173D292E1AA1779F009945FC /* MBFooterTextCell.m in Sources */,
+				A65F4B1C1D10563900D039BD /* DMGridStackView.m in Sources */,
 				A6AF0B701CF56AC90037CC70 /* DMTableGridCellQueue.m in Sources */,
 				C6BF268D1A4AC967008EB93F /* MBFooterPopupButtonCell.m in Sources */,
 				E2E62BBD1781C37B00F36275 /* MBTableGridHeaderCell.m in Sources */,

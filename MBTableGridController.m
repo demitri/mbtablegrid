@@ -771,7 +771,7 @@ NSString * const ColumnText4 = @"text4";
 	view.translatesAutoresizingMaskIntoConstraints = NO;
 	//view.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
 //	view.textField.stringValue = [NSString stringWithFormat:@"%d", arc4random_uniform(42)];
-	view.textField.stringValue = [NSString stringWithFormat:@"[%lu x %lu]", columnIndex, row+1];
+	view.textField.stringValue = [NSString stringWithFormat:@"[%lu x %lu]", columnIndex, row];
 	view.canDrawSubviewsIntoLayer = YES;
 	return view;
 }

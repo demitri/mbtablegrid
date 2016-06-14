@@ -24,6 +24,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
+#import "DMGridStackView.h"
 
 #define MBTableGridColumnHeaderHeight 24.0
 #define MBTableGridColumnHeaderWidth 60
@@ -37,16 +38,6 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
     MBTableGridTrackingPartFillTop,
     MBTableGridTrackingPartFillBottom
 };
-
-@interface DMStackView : NSStackView
-@property (nonatomic, assign) BOOL visible;
-@property (nonatomic, assign) unsigned int column;
-@property (nonatomic, weak) NSLayoutConstraint *widthConstraint;
-//@property (nonatomic, weak) NSLayoutConstraint *spacerViewHeightConstraint;
-//@property (nonatomic, strong) NSView *spacerView; // at the top, first view
-@property (nonatomic, weak) NSLayoutConstraint *leftConstraint;
-@property (nonatomic, assign) NSRange rowsInStack;
-@end
 
 @class MBTableGrid, MBTableGridCell;
 
