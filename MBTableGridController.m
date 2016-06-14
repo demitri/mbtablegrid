@@ -94,7 +94,8 @@ NSString * const ColumnText4 = @"text4";
 		return;
 	
 	[self.tableGrid registerNib:[[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil]
-			 forIdentifier:@"BasicCellView"];
+				  forIdentifier:@"BasicCellView"
+					   andOwner:self];
 	
     columnSampleWidths = @[@40, @50, @60, @70, @80, @90, @100, @110, @120, @130];
     

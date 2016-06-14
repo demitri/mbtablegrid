@@ -1277,7 +1277,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			// make any cells in the view available for reuse
 			while (stackView.views.count > 0) {
 				NSView *view = stackView.views.firstObject;
-				[view removeFromSuperview];
+				[stackView removeView:view];
 				[_tableGrid enqueueView:view forIdentifier:view.identifier];
 			}
 			stackView.rowsInStack = NSMakeRange(0,0);
@@ -1285,7 +1285,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			[stackViewsAvailableForReuse addObject:stackView];
 			[self.stackViewForColumn removeObjectForKey:@(stackView.column)];
 			
-			NSLog(@"dropping stackView: %d", stackView.column);
+			//NSLog(@"dropping stackView: %d", stackView.column);
 		}
 	}
 	
@@ -1335,7 +1335,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				[self addSubview:stackView];
 				[self.stackViewForColumn setObject:stackView forKey:@(colNumber)];
 				
-				NSLog(@"reusing stackView: %d", stackView.column);
+				//NSLog(@"reusing stackView: %d", stackView.column);
 
 				/*
 				// make any cells in the view available for reuse
@@ -1356,8 +1356,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				stackView.alignment = NSLayoutAttributeWidth;
 				stackView.column = colNumber;
 				stackView.rowsInStack = NSMakeRange(0, 0);
+				stackView.wantsLayer = YES;
 				
-				NSLog(@"creating stackView: %d", stackView.column);
+				//NSLog(@"creating stackView: %d", stackView.column);
 
 				self.stackViewForColumn[@(colNumber)] = stackView;
 				
@@ -1455,8 +1456,11 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		}
 		else if (intersectionRange.length == 0) {
 			// [A] ranges don't intersect, remove all cells
-			while (stackView.views.count)
-				[stackView removeView:stackView.views.lastObject];
+			while (stackView.views.count) {
+				NSView *view = stackView.views.lastObject;
+				[_tableGrid enqueueView:view forIdentifier:view.identifier];
+				[stackView removeView:view];
+			}
 			//stackView.rowsInStack = NSMakeRange(0, 0);
 			
 			// add cells requested
@@ -1467,6 +1471,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
 										   viewForTableColumn:colNumber
 													   andRow:row];
+				view.wantsLayer = YES;
 				view.translatesAutoresizingMaskIntoConstraints = NO;
 				
 				// fix height of cell view

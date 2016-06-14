@@ -116,7 +116,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		columnIndexNames = [NSMutableArray array];
 		_columnWidths = [NSMutableDictionary dictionary];
 		self.cellQueue = [[DMTableGridCellQueue alloc] init];
-
+		
 		// Post frame changed notifications
 		// --------------------------------
 		[self setPostsFrameChangedNotifications:YES];
@@ -1464,10 +1464,19 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 #pragma mark -
 #pragma mark View-based cell methods
 // [dm]
-- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier
+- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner
 {
 	// pass through to queue object
-	[self.cellQueue registerNib:nib forIdentifier:identifier];
+	[self.cellQueue registerNib:nib forIdentifier:identifier andOwner:owner];
+	//self.cellQueue.fillCache = YES;
+	//self.cellQueue.minimumCacheSize = 900;
+	/*
+	// prefill cache:
+	for (int i=0; i < 400; i++) {
+		NSView *view =  //[self.cellQueue dequeueViewWithIdentifier:identifier owner:self];
+		[self.cellQueue enqueueView:view withIdentifier:identifier];
+	}
+	 */
 }
 
 - (NSTableCellView*)makeViewWithIdentifier:(NSString*)identifier owner:(id)owner

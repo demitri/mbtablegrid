@@ -591,7 +591,7 @@ cells. A cell can individually override this behavior. */
 #pragma mark new (DM)
 //[dm]
 
-- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier;
+- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner;
 - (NSTableCellView*)makeViewWithIdentifier:(NSString*)identifier owner:(id)owner;
 - (void)enqueueView:(NSView*)view forIdentifier:(NSString*)identifier;
 

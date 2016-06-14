@@ -16,11 +16,16 @@
 
 @property(nonatomic, readonly) NSMutableDictionary <NSString *,NSNib *> *registeredNibsByIdentifier;
 
-- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier;
+@property(nonatomic, assign) NSUInteger minimumCacheSize;
+@property(nonatomic, assign) BOOL fillCache;
+
+- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner;
 //- (void)registerCellWithIdentifier:(NSString*)cellIdentifier fromNibName:(NSString*)nibName;
 
 // enqueue / dequeue methods
 - (NSView*)dequeueViewWithIdentifier:(NSString*)identifier owner:(id)owner;
 - (void)enqueueView:(NSView*)view withIdentifier:(NSString*)identifier;
+
+- (void)fillCacheToCount:(NSUInteger)count withIdentifier:(NSString*)identifier andOwner:(id)owner;
 
 @end
