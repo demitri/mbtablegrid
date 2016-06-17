@@ -11,7 +11,7 @@
 @interface DMGridStackView : NSStackView
 
 @property (nonatomic, assign) BOOL visible;
-@property (nonatomic, assign) unsigned int column;
+@property (nonatomic, assign) NSUInteger column;
 
 @property (nonatomic, assign) NSRange rowsInStack;
 

@@ -774,6 +774,7 @@ NSString * const ColumnText4 = @"text4";
 //	view.textField.stringValue = [NSString stringWithFormat:@"%d", arc4random_uniform(42)];
 	view.textField.stringValue = [NSString stringWithFormat:@"[%lu x %lu]", columnIndex, row];
 	view.canDrawSubviewsIntoLayer = YES;
+	view.layer.backgroundColor = [NSColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.5].CGColor;
 	return view;
 }
 

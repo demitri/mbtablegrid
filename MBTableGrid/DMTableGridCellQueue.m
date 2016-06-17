@@ -59,7 +59,7 @@
 	}
 	
 	if (cellCache.count > 0) {
-		//NSLog(@"cache hit (%d)", cellCache.count);
+		NSLog(@"cache hit (%d)", cellCache.count);
 		// retrieve cell from cache
 		view = cellCache.lastObject;
 		[cellCache removeObject:view];
@@ -114,7 +114,13 @@
 	}];
 	NSAssert(index != NSNotFound, @"The main nib '%@' does not contain an NSView object with identifier '%@'.", nib, identifier);
 	
-	return topLevelObjects[index];
+	NSView *view = topLevelObjects[index];
+	view.wantsLayer = YES;
+	//view.layerContentsRedrawPolicy = NSViewLayerContentsRedrawOnSetNeedsDisplay;
+	view.translatesAutoresizingMaskIntoConstraints = YES;
+	view.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+
+	return view;
 }
 
 @end

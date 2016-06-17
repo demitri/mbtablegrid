@@ -80,7 +80,6 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 @end
 
 @interface MBTableGrid (PrivateAccessors)
-//- (MBTableGridContentView *)_contentView;
 - (void)_setStickyColumn:(MBTableGridEdge)stickyColumn row:(MBTableGridEdge)stickyRow;
 - (MBTableGridEdge)_stickyColumn;
 - (MBTableGridEdge)_stickyRow;
@@ -140,8 +139,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 											  MBTableGridColumnHeaderHeight);
 
 		columnHeaderScrollView = [[NSScrollView alloc] initWithFrame:columnHeaderFrame];
-		//columnHeaderScrollView = [[JNWScrollView alloc] initWithFrame:columnHeaderFrame];
 		columnHeaderScrollView.wantsLayer = YES;
+		columnFooterScrollView.contentView.wantsLayer = YES; // [dm]
 		columnHeaderScrollView.horizontalScrollElasticity = NSScrollElasticityNone;
 		columnHeaderScrollView.verticalScrollElasticity = NSScrollElasticityNone;
 		columnHeaderView = [[MBTableGridHeaderView alloc] initWithFrame:NSMakeRect(0, 0,
@@ -160,6 +159,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		// ---------------------
 		NSRect rowHeaderFrame = NSMakeRect(0, MBTableGridColumnHeaderHeight, MBTableGridRowHeaderWidth, self.frame.size.height - MBTableGridColumnHeaderHeight * 2);
 		rowHeaderScrollView = [[NSScrollView alloc] initWithFrame:rowHeaderFrame];
+		rowHeaderScrollView.contentView.wantsLayer = YES; // [dm]
 		rowHeaderScrollView.wantsLayer = YES;
 		rowHeaderScrollView.horizontalScrollElasticity = NO;
 		rowHeaderScrollView.verticalScrollElasticity = NO;
@@ -182,6 +182,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		
 		columnFooterScrollView = [[NSScrollView alloc] initWithFrame:columnFooterFrame];
 		columnFooterScrollView.wantsLayer = YES;
+		columnFooterScrollView.contentView.wantsLayer = YES; // [dm]
 		columnFooterScrollView.horizontalScrollElasticity = NO;
 		columnFooterScrollView.verticalScrollElasticity = NO;
 		columnFooterView = [[MBTableGridFooterView alloc] initWithFrame:NSMakeRect(0, 0,
@@ -202,6 +203,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 										 self.frame.size.height - MBTableGridColumnHeaderHeight - MBTableGridColumnHeaderHeight);
 		contentScrollView = [[NSScrollView alloc] initWithFrame:contentFrame];
 		contentScrollView.wantsLayer = YES;
+		contentScrollView.contentView.wantsLayer = YES; // [dm]
 		self.contentView = [[MBTableGridContentView alloc] initWithFrame:NSMakeRect(0, 0, contentFrame.size.width, contentFrame.size.height)
 													   andTableGrid:self];
 		self.contentView.wantsLayer = YES;
@@ -1294,7 +1296,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 	// Restore original visible rectangle of scroller
 	[self scrollToArea:visibleRect animate:NO];
-
+	
 	[self setNeedsDisplay:YES];
 	[self.contentView setNeedsDisplay:YES];
 	[self.columnHeaderView setNeedsDisplay:YES];
@@ -1657,10 +1659,6 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 @end
 
 @implementation MBTableGrid (PrivateAccessors)
-
-//- (MBTableGridContentView *)_contentView {
-//	return contentView;
-//}
 
 - (void)_setStickyColumn:(MBTableGridEdge)stickyColumn row:(MBTableGridEdge)stickyRow {
 	stickyColumnEdge = stickyColumn;
