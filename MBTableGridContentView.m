@@ -1329,7 +1329,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
 										   viewForTableColumn:column
 													   andRow:row];
-				//view.translatesAutoresizingMaskIntoConstraints = NO;
+				//view.translatesAutoresizingMaskIntoConstraints = YES;
+				//view.autoresizingMask = NSViewNotSizable;
 				
 				if (view.superview == nil)
 					[self addSubview:view]; // positioning is done in layout:
@@ -1377,7 +1378,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
 										   viewForTableColumn:column
 													   andRow:row];
-				//view.translatesAutoresizingMaskIntoConstraints = NO;
+				//view.translatesAutoresizingMaskIntoConstraints = YES;
+				//view.autoresizingMask = NSViewNotSizable;
 				
 				[gridColumn.cellViews insertObject:view atIndex:0];
 				
@@ -1400,7 +1402,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				NSView *view = [_tableGrid.delegate tableGrid:_tableGrid
 										   viewForTableColumn:column
 													   andRow:row];
-				//view.translatesAutoresizingMaskIntoConstraints = NO;
+				//view.translatesAutoresizingMaskIntoConstraints = YES;
+				//view.autoresizingMask = NSViewNotSizable;
 				
 				[gridColumn.cellViews addObject:view];
 				//[self addSubview:view];
@@ -1420,7 +1423,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		
 	} // end loop over columns
 	
-	[self.window layoutIfNeeded]; // needed?
+	//[self.window layoutIfNeeded]; // needed? no
 	self.needsDisplay = YES;
 }
 
@@ -1785,10 +1788,11 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 }
 */
 
-- (void)layout
+- (void)layout9
 {
 	[super layout];
-
+	//return;
+	
 	for (DMGridColumn *gridColumn in self.gridColumns.allValues) {
 
 		NSUInteger column = gridColumn.column;
@@ -1799,9 +1803,14 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		
 		for (NSView *view in gridColumn.cellViews) {
 			view.frame = [self frameOfCellAtColumn:column row:row];
+			
+			NSTextField *tf = view.subviews.lastObject;
+			//tf.frame = NSMakeRect(0, 0, tf.frame.size.width, tf.frame.size.height);
+			
 			row++;
 		}
 	}
+
 }
 
 // ------------------------------------------------------------------

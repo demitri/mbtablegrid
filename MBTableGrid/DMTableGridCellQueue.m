@@ -59,7 +59,7 @@
 	}
 	
 	if (cellCache.count > 0) {
-		NSLog(@"cache hit (%d)", cellCache.count);
+		//NSLog(@"cache hit (%d)", cellCache.count);
 		// retrieve cell from cache
 		view = cellCache.lastObject;
 		[cellCache removeObject:view];
@@ -96,6 +96,8 @@
 
 - (NSView*)_createNewCellWithIdentifier:(NSString*)identifier andOwner:(id)owner
 {
+	NSLog(@"creating new cell");
+	
 	NSArray *topLevelObjects;
 	NSNib *nib = self.registeredNibsByIdentifier[identifier];
 	NSAssert(nib != nil, @"lost the nib or it wasn't registered");

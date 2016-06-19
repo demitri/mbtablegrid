@@ -331,10 +331,10 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 // view optimization, only called in 10.10+
 - (BOOL)isOpaque
 {
-	return YES;
+	return NO;
 }
 
-- (void)drawRect:(NSRect)aRect {
+- (void)drawRect2:(NSRect)aRect {
 	[[NSColor windowBackgroundColor] set];
 	NSRectFill(aRect);
 }
@@ -904,8 +904,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (void)syncronizeScrollView:(NSScrollView *)scrollView withChangedBoundsOrigin:(NSPoint)changedBoundsOrigin horizontal:(BOOL)horizontal {
-    
-    // Get the current origin
+
+	// Get the current origin
     NSPoint curOffset = scrollView.contentView.bounds.origin;
     NSPoint newOffset = curOffset;
     
