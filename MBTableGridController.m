@@ -34,6 +34,7 @@
 #import "MBFooterTextCell.h"
 #import "MBFooterPopupButtonCell.h"
 #import "DMTableGridCellQueue.h"
+#import "DMGridTextCell.h"
 
 NSString* kAutosavedColumnWidthKey = @"AutosavedColumnWidth";
 NSString* kAutosavedColumnIndexKey = @"AutosavedColumnIndex";
@@ -95,6 +96,10 @@ NSString * const ColumnText4 = @"text4";
 	
 	[self.tableGrid registerNib:[[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil]
 				  forIdentifier:@"BasicCellView"
+					   andOwner:self];
+	
+	[self.tableGrid registerNib:[[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil]
+				  forIdentifier:@"TextLayerCellView"
 					   andOwner:self];
 	
     columnSampleWidths = @[@40, @50, @60, @70, @80, @90, @100, @110, @120, @130];
@@ -766,7 +771,34 @@ NSString * const ColumnText4 = @"text4";
 
 #pragma mark DM methods
 
-- (NSView*)tableGrid:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row
+- (NSView*)tableGrid:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)column andRow:(NSUInteger)row
+{
+//	DMGridTextCell *view = [self.tableGrid makeViewWithIdentifier:@"TextLayerCellView" owner:self];
+	NSView* view = [tableGrid makeViewWithIdentifier:@"TextLayerCellView" fromBlock:^NSView *{
+		NSLog(@"making new cell");
+		DMGridTextCell *view = [[DMGridTextCell alloc] initWithFrame:NSMakeRect(0, 0, 93, 18)];
+		view.identifier = @"TextLayerCellView";
+		CATextLayer *textLayer = (CATextLayer*)view.layer;
+		//textLayer.string = [NSString stringWithFormat:@"[%lu x %lu]", column, row];
+		textLayer.font = CTFontCopyGraphicsFont((CTFontRef)[NSFont labelFontOfSize:10.0f], NULL);
+		textLayer.fontSize = 10.0f;
+		//textLayer.alignmentMode = kCAAlignmentRight;
+		//textLayer.foregroundColor = [NSColor blackColor].CGColor;
+		//textLayer.truncationMode = kCATruncationEnd;
+		view.autoresizingMask = NSViewNotSizable;
+		return view;
+	}];
+	CATextLayer *textLayer = (CATextLayer*)view.layer;
+	textLayer.foregroundColor = [NSColor blackColor].CGColor;
+	textLayer.fontSize = 10.0f;
+	textLayer.alignmentMode = kCAAlignmentRight;
+	textLayer.truncationMode = kCATruncationEnd;
+	textLayer.string = [NSString stringWithFormat:@"[%lu x %lu]", column, row];
+	
+	return view;
+}
+
+- (NSView*)tableGrid2:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row
 {
 	NSTableCellView *view = [self.tableGrid makeViewWithIdentifier:@"BasicCellView" owner:self];
 	view.translatesAutoresizingMaskIntoConstraints = YES;

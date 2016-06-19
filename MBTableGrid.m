@@ -1487,6 +1487,15 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	return [self.cellQueue dequeueViewWithIdentifier:identifier owner:owner];
 }
 
+- (NSView*)makeViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)())block
+{
+	NSView* cell = [self.cellQueue dequeueViewWithIdentifier:identifier owner:nil];
+	if (cell == nil) {
+		cell = block();
+	}
+	return cell;
+}
+
 - (void)enqueueView:(NSView*)view forIdentifier:(NSString *)identifier
 {
 	// pass through to queue object

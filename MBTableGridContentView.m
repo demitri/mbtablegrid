@@ -99,6 +99,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSValue*> *rangeForColumn; // NSValue holds an NSRange
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSView*> *visibleCellsForColumn;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMGridColumn*> *gridColumns;
+- (void)_updateCellSubviewsInRect:(NSRect)rect;
 @end
 
 #pragma mark -
@@ -168,7 +169,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		self.translatesAutoresizingMaskIntoConstraints = NO;
 		self.enclosingScrollView.contentView.postsBoundsChangedNotifications = YES;
 		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(updateCellSubviews:)
+												 selector:@selector(updateCellSubviewsNotification:)
 													 name:NSViewBoundsDidChangeNotification
 												   object:self.enclosingScrollView.contentView];
 		[self addObserver:self
@@ -406,6 +407,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //	turn on to make view opaque
 //	[[NSColor windowBackgroundColor] set];
 //	NSRectFill(rect);
+	
+//	[self _updateCellSubviewsInRect:rect];
 	
 	NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
 	BOOL overdrawDrequest = NSIntersectsRect(visibleRect, rect) == NO; // don't enqueue cells during a precache rect request
@@ -1224,25 +1227,30 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	return YES;
 }
 
-- (void)updateCellSubviews:(NSNotification*)notification
+- (void)updateCellSubviewsNotification:(NSNotification *)notification
 {
-	NSRect visibleRect = self.enclosingScrollView.documentVisibleRect;
-	NSPoint visibleRectDiagonalPoint = NSMakePoint(visibleRect.origin.x + visibleRect.size.width,
-												   visibleRect.origin.y + visibleRect.size.height);
+	// update visible rect
+	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
+}
+
+- (void)_updateCellSubviewsInRect:(NSRect)rect
+{
+	NSPoint rectDiagonalPoint = NSMakePoint(rect.origin.x + rect.size.width,
+											rect.origin.y + rect.size.height);
 	
-	NSUInteger minCol = [self columnAtPoint:visibleRect.origin];
-	NSUInteger maxCol = [self columnAtPoint:visibleRectDiagonalPoint];
-	NSUInteger minRow = [self rowAtPoint:visibleRect.origin];
-	NSUInteger maxRow = [self rowAtPoint:visibleRectDiagonalPoint];
+	NSUInteger minCol = [self columnAtPoint:rect.origin];
+	NSUInteger maxCol = [self columnAtPoint:rectDiagonalPoint];
+	NSUInteger minRow = [self rowAtPoint:rect.origin];
+	NSUInteger maxRow = [self rowAtPoint:rectDiagonalPoint];
 	
 	CGFloat cellWidth = 60.0f;
 	CGFloat cellHeight = 20.0f;
-	maxCol = ceilf(NSMaxX(visibleRect) / (self.gridLineThickness + cellWidth));
+	maxCol = ceilf(NSMaxX(rect) / (self.gridLineThickness + cellWidth));
 	maxCol = MIN(maxCol, _tableGrid.numberOfColumns-1);
-	minCol = floorf(MAX(0, NSMinX(visibleRect)) / (self.gridLineThickness + cellWidth)); // don't let x go negatve (i.e. bounce back scrolling)
-	maxRow = ceilf(NSMaxY(visibleRect) / (self.gridLineThickness + cellHeight));
+	minCol = floorf(MAX(0, NSMinX(rect)) / (self.gridLineThickness + cellWidth)); // don't let x go negatve (i.e. bounce back scrolling)
+	maxRow = ceilf(NSMaxY(rect) / (self.gridLineThickness + cellHeight));
 	maxRow = MIN(maxRow, _tableGrid.numberOfRows-1);
-	minRow = floorf(MAX(0, visibleRect.origin.y) / (self.gridLineThickness + cellHeight)); // don't let y go negatve (i.e. bounce back scrolling)
+	minRow = floorf(MAX(0, rect.origin.y) / (self.gridLineThickness + cellHeight)); // don't let y go negatve (i.e. bounce back scrolling)
 	
 	NSAssert(minCol != NSNotFound, @"minCol not found");
 	NSAssert(maxCol != NSNotFound, @"maxCol not found");
@@ -1261,11 +1269,13 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSAssert(maxCol >= 0 && maxCol < [_tableGrid numberOfColumns], @"bad max column");
 	NSAssert(maxRow >= 0 && maxRow < [_tableGrid numberOfRows], @"bad max column");
 
-//	minRow = ((NSInteger)minRow - 10 < 0) ? 0 : minRow - 10;
-//	maxRow = MIN(maxRow+10, [_tableGrid numberOfRows] - 1);
+	/*
+	minRow = ((NSInteger)minRow - 10 < 0) ? 0 : minRow - 10;
+	maxRow = MIN(maxRow+10, [_tableGrid numberOfRows] - 1);
 	
-//	minCol = ((NSInteger)minCol - 10 < 0) ? 0 : minCol - 10;
-//	maxCol = MIN(maxCol+10, [_tableGrid numberOfColumns] - 1);
+	minCol = ((NSInteger)minCol - 10 < 0) ? 0 : minCol - 10;
+	maxCol = MIN(maxCol+10, [_tableGrid numberOfColumns] - 1);
+	 */
 	
 	// Remove columns of cells that are no longer visible
 	// --------------------------------------------------
@@ -1424,7 +1434,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	} // end loop over columns
 	
 	//[self.window layoutIfNeeded]; // needed? no
-	self.needsDisplay = YES;
+	//self.needsDisplay = YES;
 }
 
 - (void)updateCellSubviews2:(NSNotification*)notification
