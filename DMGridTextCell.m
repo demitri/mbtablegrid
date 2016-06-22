@@ -31,7 +31,9 @@
 
 -(CALayer*)makeBackingLayer
 {
-	return [[CATextLayer alloc] init];
+	CATextLayer *textLayer = [[CATextLayer alloc] init];
+	textLayer.contentsScale = [[NSScreen mainScreen] backingScaleFactor];
+	return textLayer;
 }
 
 /*
