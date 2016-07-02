@@ -99,7 +99,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSValue*> *rangeForColumn; // NSValue holds an NSRange
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSView*> *visibleCellsForColumn;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMGridColumn*> *gridColumns;
+- (void)updateCellSubviewsNotification:(NSNotification *)notification;
 - (void)_updateCellSubviewsInRect:(NSRect)rect;
+- (NSArray*)_observedTableGridProperties;
 @end
 
 #pragma mark -
@@ -168,10 +170,12 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		self.gridLineThickness = 1.0f;
 		self.translatesAutoresizingMaskIntoConstraints = NO;
 		self.enclosingScrollView.contentView.postsBoundsChangedNotifications = YES;
+		
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(updateCellSubviewsNotification:)
 													 name:NSViewBoundsDidChangeNotification
 												   object:self.enclosingScrollView.contentView];
+		
 		[self addObserver:self
 			   forKeyPath:@"bounds"
 				  options:NSKeyValueObservingOptionNew
@@ -180,8 +184,20 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			   forKeyPath:@"frame"
 				  options:NSKeyValueObservingOptionNew
 				  context:nil];
+		for (NSString *property in [self _observedTableGridProperties]) {
+			[_tableGrid addObserver:self
+						 forKeyPath:property
+							options:NSKeyValueObservingOptionNew
+							context:nil];
+		}
+
 	}
 	return self;
+}
+
+- (NSArray*)_observedTableGridProperties
+{
+	return @[@"numberOfRows", @"numberOfColumns"];
 }
 
 - (void)viewDidMoveToSuperview
@@ -215,6 +231,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[self removeObserver:self forKeyPath:@"frame"];
 	[self removeObserver:self forKeyPath:@"bounds"];
+
+	for (NSString *property in [self _observedTableGridProperties])
+		[_tableGrid removeObserver:self forKeyPath:property];
 }
 
 - (void)mylistener:(id)sender
@@ -272,6 +291,14 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 }
 
 // ---------------------------------------------------------
+/*
+- (void)prepareContentInRect:(NSRect)rect
+{
+	[self _updateCellSubviewsInRect:rect];
+	
+	[super prepareContentInRect:rect];
+}
+*/
 /*
 - (void)prepareContentInRect:(NSRect)rect
 {
@@ -413,7 +440,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
 	BOOL overdrawDrequest = NSIntersectsRect(visibleRect, rect) == NO; // don't enqueue cells during a precache rect request
 
-	NSLog(@"draw rect: %@ %@", NSStringFromRect(rect), overdrawDrequest ? @"(overdraw)" : @"");
+	//NSLog(@"draw rect: %@ %@", NSStringFromRect(rect), overdrawDrequest ? @"(overdraw)" : @"");
 
 	//NSRect *rectsBeingDrawn;
 	//NSInteger count;
@@ -1230,52 +1257,86 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (void)updateCellSubviewsNotification:(NSNotification *)notification
 {
 	// update visible rect
+	NSLog(@"note");
 	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 }
 
 - (void)_updateCellSubviewsInRect:(NSRect)rect
 {
-	NSPoint rectDiagonalPoint = NSMakePoint(rect.origin.x + rect.size.width,
-											rect.origin.y + rect.size.height);
+	NSLog(@"updateCells: %@", NSStringFromRect(rect));
 	
-	NSUInteger minCol = [self columnAtPoint:rect.origin];
-	NSUInteger maxCol = [self columnAtPoint:rectDiagonalPoint];
-	NSUInteger minRow = [self rowAtPoint:rect.origin];
-	NSUInteger maxRow = [self rowAtPoint:rectDiagonalPoint];
+	NSUInteger minCol, minRow, maxCol, maxRow;
 	
-	CGFloat cellWidth = 60.0f;
-	CGFloat cellHeight = 20.0f;
-	maxCol = ceilf(NSMaxX(rect) / (self.gridLineThickness + cellWidth));
-	maxCol = MIN(maxCol, _tableGrid.numberOfColumns-1);
-	minCol = floorf(MAX(0, NSMinX(rect)) / (self.gridLineThickness + cellWidth)); // don't let x go negatve (i.e. bounce back scrolling)
-	maxRow = ceilf(NSMaxY(rect) / (self.gridLineThickness + cellHeight));
-	maxRow = MIN(maxRow, _tableGrid.numberOfRows-1);
-	minRow = floorf(MAX(0, rect.origin.y) / (self.gridLineThickness + cellHeight)); // don't let y go negatve (i.e. bounce back scrolling)
-	
-	NSAssert(minCol != NSNotFound, @"minCol not found");
-	NSAssert(maxCol != NSNotFound, @"maxCol not found");
-	NSAssert(minRow != NSNotFound, @"minRow not found");
-	NSAssert(maxRow != NSNotFound, @"maxRow not found");
-	
-	/*
-	 if (maxRow >= [_tableGrid numberOfRows])
-		maxRow = [_tableGrid numberOfRows] - 1;
-	 if (maxCol >= [_tableGrid numberOfColumns])
-		maxCol = [_tableGrid numberOfColumns] - 1;
-	 */
-	
-	NSAssert(minCol >= 0 && minCol < [_tableGrid numberOfColumns], @"bad min column");
-	NSAssert(minRow >= 0 && minRow < [_tableGrid numberOfRows], @"bad min column");
-	NSAssert(maxCol >= 0 && maxCol < [_tableGrid numberOfColumns], @"bad max column");
-	NSAssert(maxRow >= 0 && maxRow < [_tableGrid numberOfRows], @"bad max column");
-
-	/*
-	minRow = ((NSInteger)minRow - 10 < 0) ? 0 : minRow - 10;
-	maxRow = MIN(maxRow+10, [_tableGrid numberOfRows] - 1);
-	
-	minCol = ((NSInteger)minCol - 10 < 0) ? 0 : minCol - 10;
-	maxCol = MIN(maxCol+10, [_tableGrid numberOfColumns] - 1);
-	 */
+	// Determine min/max row columns
+	// -----------------------------
+	if (_tableGrid.numberOfColumns == 0 || _tableGrid.numberOfRows == 0) {
+		minCol = 0;
+		maxCol = 0;
+		minRow = 0;
+		maxRow = 0;
+	} else {
+		// get row, column from given rect
+		//
+		NSPoint rectDiagonalPoint = NSMakePoint(rect.origin.x + rect.size.width,
+												rect.origin.y + rect.size.height);
+		minCol = [self columnAtPoint:rect.origin];
+		maxCol = [self columnAtPoint:rectDiagonalPoint];
+		minRow = [self rowAtPoint:rect.origin];
+		maxRow = [self rowAtPoint:rectDiagonalPoint];
+		
+		if (minRow == NSNotFound || maxRow == NSNotFound || minCol == NSNotFound || maxCol == NSNotFound) {
+			NSLog(@"a row or column was not found (%lu, %lu)", _tableGrid.numberOfRows, _tableGrid.numberOfColumns);
+			//return;
+		}
+		
+		// these numbers may not reflect the table itself...
+		if (_tableGrid.numberOfColumns == 0)
+			maxCol = 0;
+		else if (maxCol > _tableGrid.numberOfColumns - 1)
+			maxCol = _tableGrid.numberOfColumns - 1;
+		if (_tableGrid.numberOfRows == 0)
+			maxRow = 0;
+		else if (maxRow > _tableGrid.numberOfRows - 1)
+			maxRow = _tableGrid.numberOfRows - 1;
+		
+		//	NSLog(@"max row: %lu", maxRow);
+		
+		CGFloat cellWidth = 60.0f;
+		CGFloat cellHeight = 20.0f;
+		maxCol = ceilf(NSMaxX(rect) / (self.gridLineThickness + cellWidth));
+		maxCol = MIN(maxCol, _tableGrid.numberOfColumns-1);
+		minCol = floorf(MAX(0, NSMinX(rect)) / (self.gridLineThickness + cellWidth)); // don't let x go negatve (i.e. bounce back scrolling)
+		maxRow = ceilf(NSMaxY(rect) / (self.gridLineThickness + cellHeight));
+		maxRow = MIN(maxRow, _tableGrid.numberOfRows-1);
+		minRow = floorf(MAX(0, rect.origin.y) / (self.gridLineThickness + cellHeight)); // don't let y go negatve (i.e. bounce back scrolling)
+		
+		NSAssert(minCol != NSNotFound, @"minCol not found");
+		NSAssert(maxCol != NSNotFound, @"maxCol not found");
+		NSAssert(minRow != NSNotFound, @"minRow not found");
+		NSAssert(maxRow != NSNotFound, @"maxRow not found");
+		
+		/*
+		 if (maxRow >= [_tableGrid numberOfRows])
+		 maxRow = [_tableGrid numberOfRows] - 1;
+		 if (maxCol >= [_tableGrid numberOfColumns])
+		 maxCol = [_tableGrid numberOfColumns] - 1;
+		 */
+		
+		NSAssert(minCol >= 0 && minCol <= _tableGrid.numberOfColumns, @"bad min column");
+		NSAssert(minRow >= 0 && minRow <= _tableGrid.numberOfRows, @"bad min column");
+		NSAssert(maxCol < _tableGrid.numberOfColumns, @"bad max column");
+		NSAssert(maxRow < _tableGrid.numberOfRows, @"bad max row");
+		
+		/*
+		 // create our own padding here
+		 //
+		 minRow = ((NSInteger)minRow - 10 < 0) ? 0 : minRow - 10;
+		 maxRow = MIN(maxRow+10, [_tableGrid numberOfRows] - 1);
+		 
+		 minCol = ((NSInteger)minCol - 10 < 0) ? 0 : minCol - 10;
+		 maxCol = MIN(maxCol+10, [_tableGrid numberOfColumns] - 1);
+		 */
+	}
 	
 	// Remove columns of cells that are no longer visible
 	// --------------------------------------------------
@@ -1293,8 +1354,12 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				[_tableGrid enqueueView:view forIdentifier:view.identifier];
 			}
 			[self.gridColumns removeObjectForKey:@(gridColumn.column)];
+			self.needsDisplay = YES;
 		}
 	}
+	
+	if (_tableGrid.numberOfColumns == 0)
+		return;
 	
 	// Iterate over all visible columns.
 	// ---------------------------------
@@ -2317,9 +2382,12 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	if (object == self) {
 		if ([keyPath isEqualToString:@"bounds"]) {
 			NSLog(@"content view bounds changed");
+			return;
 		}
 		else if ([keyPath isEqualToString:@"frame"]) {
+			[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 			NSLog(@"content view frame changed");
+			return;
 		}
 	}
 	else if (object == self.superview) { // clip view
@@ -2331,10 +2399,27 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			scrollPrefetchPosY = self.bounds.size.height * pad;
 			scrollPrefetchNegX = self.bounds.size.width * pad;
 			scrollPrefetchNegY = self.bounds.size.height * pad;
+			return;
 		}
 	}
-	else
-		[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
+	else if (object == _tableGrid) {
+		//return;
+		if ([keyPath isEqualToString:@"numberOfRows"] || [keyPath isEqualToString:@"numberOfColumns"]) {
+			
+			if ([keyPath isEqualToString:@"numberOfRows"])
+				NSLog(@"New number of rows: %d", _tableGrid.numberOfRows);
+			else if ([keyPath isEqualToString:@"numberOfColumns"])
+				NSLog(@"New number of columns: %d", _tableGrid.numberOfColumns);
+			
+			//NSLog(@"clip frame: %@", NSStringFromRect(self.superview.frame));
+			
+			//[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
+			//self.needsDisplay = YES;
+			return;
+		}
+	}
+	
+	[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
 
 @end

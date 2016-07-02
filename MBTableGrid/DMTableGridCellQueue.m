@@ -108,7 +108,7 @@
 
 - (NSView*)_createNewCellWithIdentifier:(NSString*)identifier // andOwner:(id)owner
 {
-	NSLog(@"creating new cell");
+	//NSLog(@"creating new cell");
 	
 	id nibOrBlock = self.registeredObjectsByIdentifier[identifier]; // self.registeredNibsByIdentifier[identifier];
 	

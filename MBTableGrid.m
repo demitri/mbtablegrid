@@ -254,6 +254,9 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		shouldOverrideModifiers = NO;
 		singleClickCellEdit = NO;
 		
+		self.numberOfColumns = 0;
+		self.numberOfRows = 0;
+		
 		self.columnRects = [NSMutableDictionary dictionary];
 	}
 	return self;
