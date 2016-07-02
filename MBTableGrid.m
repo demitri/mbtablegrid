@@ -93,6 +93,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 @interface MBTableGrid ()
 @property (nonatomic, strong) DMTableGridCellQueue *cellQueue;
+@property (nonatomic, strong) MBTableGridHeaderView *columnHeaderView;
 @end
 
 @implementation MBTableGrid
@@ -143,14 +144,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		columnFooterScrollView.contentView.wantsLayer = YES; // [dm]
 		columnHeaderScrollView.horizontalScrollElasticity = NSScrollElasticityNone;
 		columnHeaderScrollView.verticalScrollElasticity = NSScrollElasticityNone;
-		columnHeaderView = [[MBTableGridHeaderView alloc] initWithFrame:NSMakeRect(0, 0,
+		self.columnHeaderView = [[MBTableGridHeaderView alloc] initWithFrame:NSMakeRect(0, 0,
 																				   columnHeaderFrame.size.width,
 																				   columnHeaderFrame.size.height)
 														   andTableGrid:self];
-		columnHeaderView.wantsLayer = YES;
-		//	[columnHeaderView setAutoresizingMask:NSViewWidthSizable];
-		columnHeaderView.orientation = MBTableHeaderHorizontalOrientation;
-		columnHeaderScrollView.documentView = columnHeaderView;
+		self.columnHeaderView.wantsLayer = YES;
+		//	[self.columnHeaderView setAutoresizingMask:NSViewWidthSizable];
+		self.columnHeaderView.orientation = MBTableHeaderHorizontalOrientation;
+		columnHeaderScrollView.documentView = self.columnHeaderView;
 		columnHeaderScrollView.autoresizingMask = NSViewWidthSizable;
 		columnHeaderScrollView.drawsBackground = NO;
 		[self addSubview:columnHeaderScrollView];
@@ -265,7 +266,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 - (void)sortButtonClicked:(id)sender
 {
-	[columnHeaderView toggleSortButtonIcon:(NSButton*)sender];
+	[self.columnHeaderView toggleSortButtonIcon:(NSButton*)sender];
 }
 
 - (void)awakeFromNib {
@@ -300,7 +301,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
  * @return		The header value for the row.
  */
 - (void)setIndicatorImage:(NSImage *)anImage reverseImage:(NSImage*)reverseImg inColumns:(NSArray*)columns {
-	MBTableGridHeaderView *headerView = [self columnHeaderView];
+	MBTableGridHeaderView *headerView = self.columnHeaderView;
 	headerView.indicatorImageColumns = columns;
 	headerView.indicatorImage = anImage;
 	headerView.indicatorReverseImage = reverseImg;
@@ -353,11 +354,11 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	
 	// Update views with new sizes
 	//[contentView setFrameSize:NSMakeSize(currentWidth, NSHeight(contentView.frame))];
-	//[columnHeaderView setFrameSize:NSMakeSize(currentWidth, NSHeight(columnHeaderView.frame))];
+	//[self.columnHeaderView setFrameSize:NSMakeSize(currentWidth, NSHeight(self.columnHeaderView.frame))];
 	self.contentView.needsDisplay = YES;
-	columnHeaderView.needsDisplay = YES;
+	self.columnHeaderView.needsDisplay = YES;
 	self.needsDisplay = YES;
-	[columnHeaderView setNeedsDisplayInRect:columnHeaderView.frame];
+	[self.columnHeaderView setNeedsDisplayInRect:self.columnHeaderView.frame];
 	columnFooterView.needsDisplay = YES;
 }
 
@@ -365,7 +366,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     super.needsDisplay = needsDisplay;
     
 	self.contentView.needsDisplay = needsDisplay;
-    columnHeaderView.needsDisplay = needsDisplay;
+    self.columnHeaderView.needsDisplay = needsDisplay;
     rowHeaderView.needsDisplay = needsDisplay;
     columnFooterView.needsDisplay = needsDisplay;
 }
@@ -388,8 +389,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     
     CGFloat minColumnWidth = MBTableHeaderMinimumColumnWidth;
     
-    if (columnHeaderView.indicatorImage && [columnHeaderView.indicatorImageColumns containsObject:[NSNumber numberWithInteger:columnIndex]]) {
-        minColumnWidth += columnHeaderView.indicatorImage.size.width + 2.0f;
+    if (self.columnHeaderView.indicatorImage && [self.columnHeaderView.indicatorImageColumns containsObject:@(columnIndex)]) {
+        minColumnWidth += self.columnHeaderView.indicatorImage.size.width + 2.0f;
     }
     
     if (currentWidth < minColumnWidth) {
@@ -405,14 +406,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     
     // Update views with new sizes
     [_contentView setFrameSize:NSMakeSize(NSWidth(_contentView.frame) + distance, NSHeight(_contentView.frame))];
-    [columnHeaderView setFrameSize:NSMakeSize(NSWidth(columnHeaderView.frame) + distance, NSHeight(columnHeaderView.frame))];
+    [self.columnHeaderView setFrameSize:NSMakeSize(NSWidth(self.columnHeaderView.frame) + distance, NSHeight(self.columnHeaderView.frame))];
     [columnFooterView setFrameSize:NSMakeSize(NSWidth(columnFooterView.frame) + distance, NSHeight(columnFooterView.frame))];
     
     NSRect rectOfResizedAndVisibleRightwardColumns = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(_contentView.frame));
     [_contentView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardColumns];
     
-    NSRect rectOfResizedAndVisibleRightwardHeaders = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(columnHeaderView.frame));
-    [columnHeaderView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardHeaders];
+    NSRect rectOfResizedAndVisibleRightwardHeaders = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(self.columnHeaderView.frame));
+    [self.columnHeaderView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardHeaders];
     
     NSRect rectOfResizedAndVisibleRightwardFooters = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(columnFooterView.frame));
     [columnFooterView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardFooters];
@@ -1265,11 +1266,11 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	[_contentView setFrameSize:contentRect.size];
 
 	// Update the column header view's size
-	NSRect columnHeaderFrame = [columnHeaderView frame];
+	NSRect columnHeaderFrame = self.columnHeaderView.frame;
 	columnHeaderFrame.size.width = contentRect.size.width;
 	if(![[contentScrollView verticalScroller] isHidden]) {
 		columnHeaderFrame.size.width += [NSScroller scrollerWidthForControlSize:NSRegularControlSize scrollerStyle:NSScrollerStyleLegacy];	}
-	[columnHeaderView setFrameSize:columnHeaderFrame.size];
+	[self.columnHeaderView setFrameSize:columnHeaderFrame.size];
 
 	// Update the row header view's size
 	NSRect rowHeaderFrame = [rowHeaderView frame];
@@ -1334,7 +1335,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 - (NSRect)headerRectOfColumn:(NSUInteger)columnIndex {
-	return [self convertRect:[columnHeaderView headerRectOfColumn:columnIndex] fromView:columnHeaderView];
+	return [self convertRect:[self.columnHeaderView headerRectOfColumn:columnIndex] fromView:self.columnHeaderView];
 }
 
 - (NSRect)headerRectOfRow:(NSUInteger)rowIndex {
@@ -1374,10 +1375,6 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 }
 
 #pragma mark Auxiliary Views
-
-- (MBTableGridHeaderView *)columnHeaderView {
-	return columnHeaderView;
-}
 
 - (MBTableGridHeaderView *)rowHeaderView {
 	return rowHeaderView;

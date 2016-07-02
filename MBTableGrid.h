@@ -116,7 +116,7 @@ typedef enum {
 	
 	/* Headers */
 	NSScrollView *columnHeaderScrollView;
-	MBTableGridHeaderView *columnHeaderView;
+	//MBTableGridHeaderView *columnHeaderView;
 	NSScrollView *rowHeaderScrollView;
 	MBTableGridHeaderView *rowHeaderView;
 	
@@ -147,7 +147,7 @@ typedef enum {
 @property (nonatomic, assign) BOOL showsGrabHandles;
 
 @property (nonatomic, strong) MBTableGridContentView *contentView;
-@property (nonatomic, readonly) MBTableGridHeaderView* columnHeaderView;
+//@property (nonatomic, readonly) MBTableGridHeaderView* columnHeaderView;
 @property (nonatomic, readonly) MBTableGridFooterView* columnFooterView;
 @property (nonatomic, readonly) MBTableGridHeaderView* rowHeaderView;
 
@@ -559,7 +559,7 @@ cells. A cell can individually override this behavior. */
  *
  * @see			rowHeaderView
  */
-- (MBTableGridHeaderView *)columnHeaderView;
+//- (MBTableGridHeaderView *)columnHeaderView;
 
 /**
  * @brief		Returns the \c MBTableGridHeaderView object used
