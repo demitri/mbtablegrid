@@ -21,14 +21,6 @@
 	return self;
 }
 
-/*
-- (void)drawRect:(NSRect)dirtyRect {
-    [super drawRect:dirtyRect];
-    
-    // Drawing code here.
-}
-*/
-
 -(CALayer*)makeBackingLayer
 {
 	CATextLayer *textLayer = [[CATextLayer alloc] init];
@@ -36,10 +28,4 @@
 	return textLayer;
 }
 
-/*
-- (BOOL)wantsLayer
-{
-	return YES;
-}
-*/
 @end

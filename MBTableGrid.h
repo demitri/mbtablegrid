@@ -591,9 +591,11 @@ cells. A cell can individually override this behavior. */
 #pragma mark new (DM)
 //[dm]
 
-- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner;
-- (NSTableCellView*)makeViewWithIdentifier:(NSString*)identifier owner:(id)owner;
-- (NSView*)makeViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)())block;
+//- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner;
+- (void)registerViewWithIdentifier:(NSString*)identifier fromNib:(NSNib*)nib; //andOwnerClass:(id)owner;
+- (void)registerViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)())block;
+- (NSView*)makeViewWithIdentifier:(NSString*)identifier; // owner:(id)owner;
+//- (NSView*)makeViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)())block;
 - (void)enqueueView:(NSView*)view forIdentifier:(NSString*)identifier;
 
 @end

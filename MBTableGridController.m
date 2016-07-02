@@ -35,6 +35,7 @@
 #import "MBFooterPopupButtonCell.h"
 #import "DMTableGridCellQueue.h"
 #import "DMGridTextCell.h"
+#import "PopupButtonTableCellView.h"
 
 NSString* kAutosavedColumnWidthKey = @"AutosavedColumnWidth";
 NSString* kAutosavedColumnIndexKey = @"AutosavedColumnIndex";
@@ -94,6 +95,25 @@ NSString * const ColumnText4 = @"text4";
 	if (_awakeFromNibInitialized)
 		return;
 	
+	NSNib *cellViewsNib = [[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil];
+	
+	[self.tableGrid registerViewWithIdentifier:@"BasicCellView"
+									   fromNib:cellViewsNib];
+	
+	[self.tableGrid registerViewWithIdentifier:@"PopupTableCell"
+									   fromNib:cellViewsNib];
+
+	[self.tableGrid registerViewWithIdentifier:@"TextLayerCellView"
+									 fromBlock:^NSView *{
+		DMGridTextCell *view = [[DMGridTextCell alloc] initWithFrame:NSMakeRect(0, 0, 93, 18)];
+		view.identifier = @"TextLayerCellView";
+		CATextLayer *textLayer = (CATextLayer*)view.layer;
+		textLayer.font = CTFontCopyGraphicsFont((CTFontRef)[NSFont labelFontOfSize:10.0f], NULL);
+		textLayer.fontSize = 10.0f;
+		return view;
+	}];
+	
+	/*
 	[self.tableGrid registerNib:[[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil]
 				  forIdentifier:@"BasicCellView"
 					   andOwner:self];
@@ -101,6 +121,7 @@ NSString * const ColumnText4 = @"text4";
 	[self.tableGrid registerNib:[[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil]
 				  forIdentifier:@"TextLayerCellView"
 					   andOwner:self];
+	*/
 	
     columnSampleWidths = @[@40, @50, @60, @70, @80, @90, @100, @110, @120, @130];
     
@@ -773,44 +794,37 @@ NSString * const ColumnText4 = @"text4";
 
 - (NSView*)tableGrid:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)column andRow:(NSUInteger)row
 {
-//	DMGridTextCell *view = [self.tableGrid makeViewWithIdentifier:@"TextLayerCellView" owner:self];
-	NSView* view = [tableGrid makeViewWithIdentifier:@"TextLayerCellView" fromBlock:^NSView *{
-		NSLog(@"making new cell");
-		DMGridTextCell *view = [[DMGridTextCell alloc] initWithFrame:NSMakeRect(0, 0, 93, 18)];
-		view.identifier = @"TextLayerCellView";
-		CATextLayer *textLayer = (CATextLayer*)view.layer;
-		//textLayer.string = [NSString stringWithFormat:@"[%lu x %lu]", column, row];
-		textLayer.font = CTFontCopyGraphicsFont((CTFontRef)[NSFont labelFontOfSize:10.0f], NULL);
-		textLayer.fontSize = 10.0f;
-		//textLayer.alignmentMode = kCAAlignmentRight;
-		//textLayer.foregroundColor = [NSColor blackColor].CGColor;
-		//textLayer.truncationMode = kCATruncationEnd;
-		view.autoresizingMask = NSViewNotSizable;
+	if (column == 1) {
+		//	DMGridTextCell *view = [self.tableGrid makeViewWithIdentifier:@"TextLayerCellView" owner:self];
+		PopupButtonTableCellView *view = (PopupButtonTableCellView*)[self.tableGrid makeViewWithIdentifier:@"PopupTableCell"];
 		return view;
-	}];
-	CATextLayer *textLayer = (CATextLayer*)view.layer;
-	textLayer.foregroundColor = [NSColor blackColor].CGColor;
-	textLayer.fontSize = 10.0f;
-	textLayer.alignmentMode = kCAAlignmentRight;
-	textLayer.truncationMode = kCATruncationEnd;
-	textLayer.string = [NSString stringWithFormat:@"[%lu x %lu]", column, row];
+	}
+	else {
+		
+		/*
+		DMGridTextCell *view = (DMGridTextCell*)[tableGrid makeViewWithIdentifier:@"TextLayerCellView" fromBlock:^NSView *{
+			DMGridTextCell *view = [[DMGridTextCell alloc] initWithFrame:NSMakeRect(0, 0, 93, 18)];
+			view.identifier = @"TextLayerCellView";
+			CATextLayer *textLayer = (CATextLayer*)view.layer;
+			textLayer.font = CTFontCopyGraphicsFont((CTFontRef)[NSFont labelFontOfSize:10.0f], NULL);
+			textLayer.fontSize = 10.0f;
+			view.autoresizingMask = NSViewNotSizable;
+			return view;
+		}];
+		 */
+		
+		DMGridTextCell *view = (DMGridTextCell*)[tableGrid makeViewWithIdentifier:@"TextLayerCellView"];
+		
+		CATextLayer *textLayer = (CATextLayer*)view.layer;
+		textLayer.foregroundColor = [NSColor blackColor].CGColor;
+		textLayer.fontSize = 10.0f;
+		textLayer.alignmentMode = kCAAlignmentRight;
+		textLayer.truncationMode = kCATruncationEnd;
+		textLayer.string = [NSString stringWithFormat:@"[%lu x %lu]", column, row];
+		return view;
+	}
 	
-	return view;
-}
-
-- (NSView*)tableGrid2:(MBTableGrid *)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row
-{
-	NSTableCellView *view = [self.tableGrid makeViewWithIdentifier:@"BasicCellView" owner:self];
-	view.translatesAutoresizingMaskIntoConstraints = YES;
-	view.autoresizingMask = NSViewNotSizable;
-	view.wantsLayer = YES;
-	view.layerContentsRedrawPolicy = NSViewLayerContentsRedrawOnSetNeedsDisplay;
-	//view.autoresizingMask = (NSViewWidthSizable | NSViewHeightSizable);
-//	view.textField.stringValue = [NSString stringWithFormat:@"%d", arc4random_uniform(42)];
-	view.textField.stringValue = [NSString stringWithFormat:@"[%lu x %lu]", columnIndex, row];
-	view.canDrawSubviewsIntoLayer = YES;
-	//view.layer.backgroundColor = [NSColor colorWithRed:0.1 green:0.1 blue:0.1 alpha:0.5].CGColor;
-	return view;
+	NSAssert(FALSE, @"uncaught cell");
 }
 
 #pragma mark -

@@ -26,6 +26,8 @@
 		A6AF0B721CF598180037CC70 /* CellViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = A6AF0B711CF598180037CC70 /* CellViews.xib */; };
 		A6AF0B7F1CFC9B3E0037CC70 /* DMActiveCellsCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */; };
 		A6AF0B801CFC9B3E0037CC70 /* DMActiveCellsCache.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */; };
+		A6F67D601D25C54100A087C6 /* CellViewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D5F1D25C54100A087C6 /* CellViewsController.m */; };
+		A6F67D631D26D7FC00A087C6 /* PopupButtonTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D621D26D7FC00A087C6 /* PopupButtonTableCellView.m */; };
 		C63413B61A19F857001E9DF0 /* MBLevelIndicatorCell.h in Headers */ = {isa = PBXBuildFile; fileRef = C63413B41A19F857001E9DF0 /* MBLevelIndicatorCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		C63413B71A19F857001E9DF0 /* MBLevelIndicatorCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C63413B51A19F857001E9DF0 /* MBLevelIndicatorCell.m */; };
 		C639542C19FF3B7C0029BDF1 /* MBPopupButtonCell.h in Headers */ = {isa = PBXBuildFile; fileRef = C639542A19FF3B7C0029BDF1 /* MBPopupButtonCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -94,6 +96,10 @@
 		A6AF0B711CF598180037CC70 /* CellViews.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CellViews.xib; sourceTree = "<group>"; };
 		A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMActiveCellsCache.h; sourceTree = "<group>"; };
 		A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMActiveCellsCache.m; sourceTree = "<group>"; };
+		A6F67D5E1D25C54100A087C6 /* CellViewsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CellViewsController.h; sourceTree = "<group>"; };
+		A6F67D5F1D25C54100A087C6 /* CellViewsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CellViewsController.m; sourceTree = "<group>"; };
+		A6F67D611D26D7FC00A087C6 /* PopupButtonTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopupButtonTableCellView.h; sourceTree = "<group>"; };
+		A6F67D621D26D7FC00A087C6 /* PopupButtonTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopupButtonTableCellView.m; sourceTree = "<group>"; };
 		C63413B41A19F857001E9DF0 /* MBLevelIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBLevelIndicatorCell.h; sourceTree = SOURCE_ROOT; };
 		C63413B51A19F857001E9DF0 /* MBLevelIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBLevelIndicatorCell.m; sourceTree = SOURCE_ROOT; };
 		C639542A19FF3B7C0029BDF1 /* MBPopupButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBPopupButtonCell.h; sourceTree = SOURCE_ROOT; };
@@ -223,6 +229,10 @@
 				32CA4F630368D1EE00C91783 /* MBTableGrid_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.m */,
 				A6AF0B711CF598180037CC70 /* CellViews.xib */,
+				A6F67D611D26D7FC00A087C6 /* PopupButtonTableCellView.h */,
+				A6F67D621D26D7FC00A087C6 /* PopupButtonTableCellView.m */,
+				A6F67D5E1D25C54100A087C6 /* CellViewsController.h */,
+				A6F67D5F1D25C54100A087C6 /* CellViewsController.m */,
 			);
 			name = "Other Sources";
 			sourceTree = "<group>";
@@ -431,7 +441,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
+				A6F67D631D26D7FC00A087C6 /* PopupButtonTableCellView.m in Sources */,
 				C9412A5F0D8AE98C00E9E614 /* MBTableGridController.m in Sources */,
+				A6F67D601D25C54100A087C6 /* CellViewsController.m in Sources */,
 				A6AF0B6B1CF4F33D0037CC70 /* MyTableCellView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

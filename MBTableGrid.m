@@ -1466,30 +1466,29 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 #pragma mark -
 #pragma mark View-based cell methods
 // [dm]
-- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner
+
+//- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner
+- (void)registerViewWithIdentifier:(NSString*)identifier fromNib:(NSNib*)nib // andOwnerClass:(Class)ownerClass
 {
 	// pass through to queue object
-	[self.cellQueue registerNib:nib forIdentifier:identifier andOwner:owner];
-	//self.cellQueue.fillCache = YES;
-	//self.cellQueue.minimumCacheSize = 900;
-	/*
-	// prefill cache:
-	for (int i=0; i < 400; i++) {
-		NSView *view =  //[self.cellQueue dequeueViewWithIdentifier:identifier owner:self];
-		[self.cellQueue enqueueView:view withIdentifier:identifier];
-	}
-	 */
+	[self.cellQueue registerViewSource:nib forIdentifier:identifier];
+//	[self.cellQueue registerNib:nib forIdentifier:identifier]; // andOwnerClass:ownerClass];
 }
 
-- (NSTableCellView*)makeViewWithIdentifier:(NSString*)identifier owner:(id)owner
+- (void)registerViewWithIdentifier:(NSString *)identifier fromBlock:(NSView *(^)())block
+{
+	[self.cellQueue registerViewSource:block forIdentifier:identifier];
+}
+
+- (NSView*)makeViewWithIdentifier:(NSString*)identifier // ownerClass:(Class)ownerClass
 {
 	NSAssert(identifier != nil, @"cell identifier cannot be nil.");
-	return [self.cellQueue dequeueViewWithIdentifier:identifier owner:owner];
+	return [self.cellQueue dequeueViewWithIdentifier:identifier]; // owner:owner];
 }
 
 - (NSView*)makeViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)())block
 {
-	NSView* cell = [self.cellQueue dequeueViewWithIdentifier:identifier owner:nil];
+	NSView* cell = [self.cellQueue dequeueViewWithIdentifier:identifier]; //owner:nil];
 	if (cell == nil) {
 		cell = block();
 	}
