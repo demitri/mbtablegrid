@@ -653,7 +653,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 	NSUInteger column = [self.selectedColumnIndexes lastIndex];
 
-	if (lastRow + 1 < [self numberOfRows]) {
+	if (lastRow + 1 < self.numberOfRows) {
 		NSRect cellRect = [self frameOfCellAtColumn:column row:lastRow + 1];
 		cellRect = [self convertRect:cellRect toView:contentScrollView.contentView];
 		if (!NSContainsRect(self.contentView.visibleRect, cellRect)) {
@@ -1240,25 +1240,25 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	
 	// Set number of columns
 	if ([self.dataSource respondsToSelector:@selector(numberOfColumnsInTableGrid:)]) {
-		_numberOfColumns =  [self.dataSource numberOfColumnsInTableGrid:self];
+		self.numberOfColumns =  [self.dataSource numberOfColumnsInTableGrid:self];
 	}
 	else {
-		_numberOfColumns = 0;
+		self.numberOfColumns = 0;
 	}
 
 	// Set number of rows
 	if ([self.dataSource respondsToSelector:@selector(numberOfRowsInTableGrid:)]) {
-		_numberOfRows =  [self.dataSource numberOfRowsInTableGrid:self];
+		self.numberOfRows =  [self.dataSource numberOfRowsInTableGrid:self];
 	}
 	else {
-		_numberOfRows = 0;
+		self.numberOfRows = 0;
 	}
     
     [self populateColumnInfo];
 
 	// Update the content view's size
-    NSUInteger lastColumn = (_numberOfColumns>0) ? _numberOfColumns-1 : 0;
-    NSUInteger lastRow = (_numberOfRows>0) ? _numberOfRows-1 : 0;
+    NSUInteger lastColumn = (_numberOfColumns > 0) ? _numberOfColumns-1 : 0;
+    NSUInteger lastRow = (_numberOfRows > 0) ? _numberOfRows-1 : 0;
 	NSRect bottomRightCellFrame = [_contentView frameOfCellAtColumn:lastColumn row:lastRow];
 
 	NSRect contentRect = NSMakeRect(_contentView.frame.origin.x, _contentView.frame.origin.y,
