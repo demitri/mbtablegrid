@@ -61,7 +61,7 @@
 	[[NSGraphicsContext currentContext] restoreGraphicsState];
 	
 }
-- (NSColor*)textShadow
+- (NSShadow*)textShadow
 {
 	if (_textShadow == nil) {
 		_textShadow = [[NSShadow alloc] init];

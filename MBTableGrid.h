@@ -154,6 +154,8 @@ typedef enum {
 - (void)setSelectedRowIndexes:(NSIndexSet *)anIndexSet notify:(BOOL)notify;
 - (void)setSelectedColumnIndexes:(NSIndexSet *)anIndexSet notify:(BOOL)notify;
 
+- (void)sortButtonClicked:(id)sender;
+
 #pragma mark -
 #pragma mark Reloading the Grid
 

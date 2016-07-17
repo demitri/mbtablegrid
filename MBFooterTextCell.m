@@ -58,7 +58,7 @@
 	return _attributedTitleFont;
 }
 
-- (NSColor*)textShadow
+- (NSShadow*)textShadow
 {
 	if (_textShadow == nil) {
 		_textShadow = [[NSShadow alloc] init];
