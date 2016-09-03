@@ -408,7 +408,10 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     }
     
     // Update views with new sizes
-    [_contentView setFrameSize:NSMakeSize(NSWidth(_contentView.frame) + distance, NSHeight(_contentView.frame))];
+    //[_contentView setFrameSize:NSMakeSize(NSWidth(_contentView.frame) + distance, NSHeight(_contentView.frame))];
+	[_contentView resetDocumentView];
+	[_contentView updateCellSubviewsNotification:nil];
+	
     [self.columnHeaderView setFrameSize:NSMakeSize(NSWidth(self.columnHeaderView.frame) + distance, NSHeight(self.columnHeaderView.frame))];
     [columnFooterView setFrameSize:NSMakeSize(NSWidth(columnFooterView.frame) + distance, NSHeight(columnFooterView.frame))];
     

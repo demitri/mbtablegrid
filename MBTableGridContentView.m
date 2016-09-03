@@ -1252,6 +1252,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 #pragma mark -
 #pragma mark [dm] Layout methods
+
 /*
 - (void)resizeWithOldSuperviewSize:(NSSize)oldSize {};
 
@@ -1299,19 +1300,19 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)_tableGridDataReloaded:(NSNotification*)notification
 {
-	//[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
+	; //[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 }
 
 - (void)updateCellSubviewsNotification:(NSNotification *)notification
 {
 	// update visible rect
-	NSLog(@"updateCellSubviewsNotification");
+	//NSLog(@"updateCellSubviewsNotification");
 	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 }
 
 - (void)_updateCellSubviewsInRect:(NSRect)rect
 {
-	//NSLog(@"updateCells: %@", NSStringFromRect(rect));
+	NSLog(@"updateCells: %@", NSStringFromRect(rect));
 	
 	NSUInteger minCol, minRow, maxCol, maxRow;
 	
@@ -1450,8 +1451,26 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		else
 			newRowRange = NSMakeRange(minRow, maxRow - minRow + 1);
 		
-		if (NSEqualRanges(gridColumn.range, newRowRange)) // start, length
-			continue; // no changes to rows in gridColumn
+		if (NSEqualRanges(gridColumn.range, newRowRange)) {
+
+			// The row ranges don't change when the column width is
+			// being resized, but in this case the layout still needs to be
+			// updated. Check for the mouse button being down and update
+			// the visible frames.
+			
+			NSUInteger pressedButtonMask = [NSEvent pressedMouseButtons];
+			BOOL leftMouseDown = (pressedButtonMask & (1 << 0)) != 0;
+
+			if (leftMouseDown)
+			{
+				for (NSUInteger i=0; i < gridColumn.range.length; i++) {
+					NSUInteger row = gridColumn.range.location + i;
+					NSView *cell = gridColumn.cellViews[i];
+					cell.frame = [self frameOfCellAtColumn:column row:row];
+				}
+			} else
+				continue; // no changes to rows in gridColumn
+		}
 		
 		NSRange intersectionRange = NSIntersectionRange(gridColumn.range, newRowRange);
 

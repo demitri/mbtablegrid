@@ -18,8 +18,15 @@
 	fontSize = self.fontSize;
 	
 	CGContextSaveGState(ctx);
-	CGContextTranslateCTM(ctx, 0.0, (fontSize-height)/2.0 - 1.0); // negative
-	[super drawInContext:ctx];
+	{
+		// change origin of the user coordinate system
+		//
+		CGContextTranslateCTM(ctx,							// context
+							  -3.0,							// amount to move x-axis - give a bit of padding instead of drawing at edge
+							  (fontSize-height)/2.0 - 1.0); // amount to move y-axis to vertically center text (negative)
+
+		[super drawInContext:ctx];
+	}
 	CGContextRestoreGState(ctx);
 }
 
