@@ -54,7 +54,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 - (NSString *)_headerStringForRow:(NSUInteger)rowIndex;
 - (id)_objectValueForColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex;
 - (NSFormatter *)_formatterForColumn:(NSUInteger)columnIndex;
-- (NSCell *)_cellForColumn:(NSUInteger)columnIndex;
+//- (NSCell *)_cellForColumn:(NSUInteger)columnIndex;
 - (NSImage *)_accessoryButtonImageForColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex;
 - (void)_accessoryButtonClicked:(NSUInteger)columnIndex row:(NSUInteger)rowIndex;
 - (NSArray *)_availableObjectValuesForColumn:(NSUInteger)columnIndex;
@@ -303,7 +303,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
  *
  * @return		The header value for the row.
  */
-- (void)setIndicatorImage:(NSImage *)anImage reverseImage:(NSImage*)reverseImg inColumns:(NSArray*)columns {
+- (void)setIndicatorImage:(NSImage *)anImage reverseImage:(NSImage*)reverseImg inColumns:(NSArray*)columns
+{
 	MBTableGridHeaderView *headerView = self.columnHeaderView;
 	headerView.indicatorImageColumns = columns;
 	headerView.indicatorImage = anImage;
@@ -376,7 +377,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 #pragma mark Resize scrollview content size
 
-- (CGFloat)resizeColumnWithIndex:(NSUInteger)columnIndex withDistance:(float)distance location:(NSPoint)location {
+- (CGFloat)resizeColumnWithIndex:(NSUInteger)columnIndex withDistance:(float)distance location:(NSPoint)location
+{
 	// Note that we only need this rect for its origin, which won't be changing, otherwise we'd need to flush the column rect cache first
 	NSRect columnRect = [self rectOfColumn:columnIndex];
 
@@ -407,21 +409,25 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
         distance = 0.0;
     }
     
-    // Update views with new sizes
-    //[_contentView setFrameSize:NSMakeSize(NSWidth(_contentView.frame) + distance, NSHeight(_contentView.frame))];
+    // Update table cell views with new sizes
 	[_contentView resetDocumentView];
-	[_contentView updateCellSubviewsNotification:nil];
 	
     [self.columnHeaderView setFrameSize:NSMakeSize(NSWidth(self.columnHeaderView.frame) + distance, NSHeight(self.columnHeaderView.frame))];
     [columnFooterView setFrameSize:NSMakeSize(NSWidth(columnFooterView.frame) + distance, NSHeight(columnFooterView.frame))];
     
-    NSRect rectOfResizedAndVisibleRightwardColumns = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(_contentView.frame));
+    NSRect rectOfResizedAndVisibleRightwardColumns = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0,
+																_contentView.bounds.size.width - columnRect.origin.x,
+																NSHeight(_contentView.frame));
     [_contentView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardColumns];
     
-    NSRect rectOfResizedAndVisibleRightwardHeaders = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(self.columnHeaderView.frame));
+    NSRect rectOfResizedAndVisibleRightwardHeaders = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0,
+																_contentView.bounds.size.width - columnRect.origin.x,
+																NSHeight(self.columnHeaderView.frame));
     [self.columnHeaderView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardHeaders];
     
-    NSRect rectOfResizedAndVisibleRightwardFooters = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0, _contentView.bounds.size.width - columnRect.origin.x, NSHeight(columnFooterView.frame));
+    NSRect rectOfResizedAndVisibleRightwardFooters = NSMakeRect(columnRect.origin.x - rowHeaderView.bounds.size.width, 0,
+																_contentView.bounds.size.width - columnRect.origin.x,
+																NSHeight(columnFooterView.frame));
     [columnFooterView setNeedsDisplayInRect:rectOfResizedAndVisibleRightwardFooters];
     
     return offset;
@@ -878,6 +884,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	[self reloadData];
 }
 
+/*
 - (void)insertText:(id)aString {
 	NSUInteger column = [self.selectedColumnIndexes firstIndex];
 	NSCell *selectedCell = [self _cellForColumn:column];
@@ -902,6 +909,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	[self setNeedsDisplay:YES];
 
 }
+*/
 
 #pragma mark -
 #pragma mark Notifications
@@ -1567,12 +1575,14 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     return nil;
 }
 
+/*
 - (NSCell *)_cellForColumn:(NSUInteger)columnIndex {
 	if ([self.dataSource respondsToSelector:@selector(tableGrid:cellForColumn:)]) {
 		return [self.dataSource tableGrid:self cellForColumn:columnIndex];
 	}
 	return nil;
 }
+*/
 
 - (NSArray *)_availableObjectValuesForColumn:(NSUInteger)columnIndex {
 	if ([self.dataSource respondsToSelector:@selector(tableGrid:availableObjectValuesForColumn:)]) {

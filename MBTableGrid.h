@@ -703,7 +703,7 @@ cells. A cell can individually override this behavior. */
  *
  *  @return     The cell for the specified column
  */
-- (NSCell *)tableGrid:(MBTableGrid *)aTableGrid cellForColumn:(NSUInteger)columnIndex;
+//- (NSCell *)tableGrid:(MBTableGrid *)aTableGrid cellForColumn:(NSUInteger)columnIndex;
 
 @optional
 

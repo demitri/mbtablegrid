@@ -45,7 +45,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 @interface MBTableGrid (Private)
 - (id)_objectValueForColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex;
 - (NSFormatter *)_formatterForColumn:(NSUInteger)columnIndex;
-- (NSCell *)_cellForColumn:(NSUInteger)columnIndex;
+//- (NSCell *)_cellForColumn:(NSUInteger)columnIndex;
 - (NSImage *)_accessoryButtonImageForColumn:(NSUInteger)columnIndex row:(NSUInteger)rowIndex;
 - (void)_accessoryButtonClicked:(NSUInteger)columnIndex row:(NSUInteger)rowIndex;
 - (NSArray *)_availableObjectValuesForColumn:(NSUInteger)columnIndex;
@@ -160,10 +160,12 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		
 		NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
 
+		/*
 		[nc addObserver:self
 			   selector:@selector(mylistener:)
 				   name:@"NSMenuDidChangeItemNotification"
 				 object:nil];
+		 */
 		
 		self.canDrawSubviewsIntoLayer = YES; // [dm]
 		self.visibleCells = [NSMutableDictionary dictionary];
@@ -258,6 +260,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		[_tableGrid removeObserver:self forKeyPath:property];
 }
 
+/*
+// called with NSMenuDidChangeItemNotification notifications
+//
 - (void)mylistener:(id)sender
 {
 	NSInteger selectedColumn = [self.tableGrid.selectedColumnIndexes firstIndex];
@@ -272,6 +277,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		//[popupCell selectItemWithTitle:[[popupCell selectedItem] title]];
 	}
 }
+*/
 
 // view optimization, only called in 10.10+
 - (BOOL)isOpaque
@@ -662,6 +668,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //	NSUInteger column = firstColumn;
 	
 //	column = firstColumn;
+	/* // cell based drawing - not needed with views
 	if (0) {
 		NSUInteger column = 0;
 //	for (NSUInteger column=firstColumn; column <= lastColumn; column++) {
@@ -747,35 +754,35 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				} else {
 					// bog standard cell...
 					
-					/*
-					MBTableGridCell *cell = (MBTableGridCell *)_cell;
-                    
-                    cell.accessoryButtonImage = [_tableGrid _accessoryButtonImageForColumn:column row:row];
-                    
-					[cell drawWithFrame:cellFrame inView:self withBackgroundColor:backgroundColor];// Draw background color
-					*/
+					//MBTableGridCell *cell = (MBTableGridCell *)_cell;
+                    //
+                    //cell.accessoryButtonImage = [_tableGrid _accessoryButtonImageForColumn:column row:row];
+                    //
+					//[cell drawWithFrame:cellFrame inView:self withBackgroundColor:backgroundColor];// Draw background color
+					//
 					
 					//NSUInteger indices[] = {column, row};
 					//NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
 					
 					//NSView *tableCellView = self.activeTableCells[indexPath];
 					
-					/*
-					NSView *tableCellView = columnCellCache[@(row)];
-					if (tableCellView == nil) {
-						tableCellView = [_tableGrid.delegate tableGrid:_tableGrid viewForTableColumn:column andRow:row];
-						[self addSubview:tableCellView];
-						//self.activeTableCells[indexPath] = tableCellView;
-						columnCellCache[@(row)] = tableCellView;
-						//NSLog(@"Adding index path: %@", indexPath);
-					}
-					tableCellView.frame = cellFrame;
-					*/
+					
+					//NSView *tableCellView = columnCellCache[@(row)];
+					//if (tableCellView == nil) {
+					//	tableCellView = [_tableGrid.delegate tableGrid:_tableGrid viewForTableColumn:column andRow:row];
+					//	[self addSubview:tableCellView];
+					//	//self.activeTableCells[indexPath] = tableCellView;
+					//	columnCellCache[@(row)] = tableCellView;
+					//	//NSLog(@"Adding index path: %@", indexPath);
+					//}
+					//tableCellView.frame = cellFrame;
+					
 					
 				}
 			}
 		} // end loop over rows
 	} // end loop over columns
+	*/
 	
 	//NSLog(@"number of subviews: %d", self.subviews.count);
 	//NSLog(@"B: # of active cells: %d", self.activeTableCells.count);
@@ -923,6 +930,10 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)mouseDown:(NSEvent *)theEvent
 {
+	return;
+
+	// Code to handle cell editing - need to implement for views rather than cells
+	/*
 	// Setup the timer for autoscrolling
 	// (the simply calling autoscroll: from mouseDragged: only works as long as the mouse is moving)
 	autoscrollTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(_timerAutoscrollCallback:) userInfo:nil repeats:YES];
@@ -1037,6 +1048,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	}
 
 	[self setNeedsDisplay:YES];
+	*/
 }
 
 - (void)mouseDragged:(NSEvent *)theEvent
@@ -2223,6 +2235,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)editSelectedCell:(id)sender text:(NSString *)aString
 {
+	// cell editing not yet supported - need to update for view-based cells.
+	//
+	/*
 	NSInteger selectedColumn = [self.tableGrid.selectedColumnIndexes firstIndex];
 	NSInteger selectedRow = [self.tableGrid.selectedRowIndexes firstIndex];
 	NSCell *selectedCell = [self.tableGrid _cellForColumn:selectedColumn];
@@ -2333,17 +2348,22 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			[selectedCell selectWithFrame:cellFrame inView:self editor:editor delegate:self start:0 length:[currentValue length]];
 		}
 	}
+	*/
 }
 
+/*
+ // This is for the NSCell-based table - (probably) not needed for view-based cells.
+ //
 - (void)cellPopupMenuItemSelected:(NSMenuItem *)menuItem {
 	MBPopupButtonCell *cell = (MBPopupButtonCell *)[self.tableGrid _cellForColumn:editedColumn];
-	[cell selectItem:menuItem];
+	[cell selectItem:menuItem];	
 
 	[self.tableGrid _setObjectValue:menuItem.title forColumn:editedColumn row:editedRow];
 	
 	editedColumn = NSNotFound;
 	editedRow = NSNotFound;
 }
+ */
 
 #pragma mark Layout Support
 

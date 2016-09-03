@@ -150,7 +150,8 @@ NSString * const ColumnText4 = @"text4";
     [self tableGrid:self.tableGrid addColumns:150 shouldReload:NO];
     [self tableGrid:self.tableGrid addRows:70 shouldReload:NO];
 	
-	[self.tableGrid setIndicatorImage:[NSImage imageNamed:@"sort-asc"] reverseImage:[NSImage imageNamed:@"sort-desc"] inColumns:@[@1,@3]];
+	// set which columns should have a sort icon
+	//[self.tableGrid setIndicatorImage:[NSImage imageNamed:@"sort-asc"] reverseImage:[NSImage imageNamed:@"sort-desc"] inColumns:@[@1,@3]];
 	
 	[self.tableGrid reloadData];
 	
@@ -237,7 +238,8 @@ NSString * const ColumnText4 = @"text4";
 	return [columns count];
 }
 
-- (NSString *)tableGrid:(MBTableGrid *)aTableGrid headerStringForColumn:(NSUInteger)columnIndex {
+- (NSString *)tableGrid:(MBTableGrid *)aTableGrid headerStringForColumn:(NSUInteger)columnIndex
+{
 	return [NSString stringWithFormat:@"Column %lu", columnIndex];
 }
 
@@ -918,6 +920,8 @@ NSString * const ColumnText4 = @"text4";
 }
 
 @end
+
+#pragma mark -
 
 @implementation NSMutableArray (SwappingAdditions)
 
