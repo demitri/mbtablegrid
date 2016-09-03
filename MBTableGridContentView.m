@@ -1335,14 +1335,18 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		maxCol = [self columnAtPoint:rectDiagonalPoint];
 		minRow = [self rowAtPoint:unbouncyRect.origin];
 		maxRow = [self rowAtPoint:rectDiagonalPoint] + 1;
+
+		// If the number of rows/columns don't fill the visible clip view, NSNotFound will be returned (but is not a mistake!).
+		
 		if (maxRow == NSNotFound)
 			maxRow = _tableGrid.numberOfRows - 1;
+		else if (maxRow >= _tableGrid.numberOfRows)
+			maxRow = _tableGrid.numberOfRows - 1;
+
 		if (maxCol == NSNotFound)
 			maxCol = _tableGrid.numberOfColumns - 1;
-		if (maxRow >= _tableGrid.numberOfRows)
-			maxRow = _tableGrid.numberOfRows - 1;
-		
-		NSLog(@"row range: %d-%d", minRow, maxRow);
+		else if (maxCol >= _tableGrid.numberOfColumns)
+			maxCol = _tableGrid.numberOfColumns - 1;
 		
 		/*
 		if (minRow == NSNotFound || maxRow == NSNotFound || minCol == NSNotFound || maxCol == NSNotFound) {

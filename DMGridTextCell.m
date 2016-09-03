@@ -7,6 +7,7 @@
 //
 
 #import "DMGridTextCell.h"
+#import "DMTextLayer.h"
 #import <QuartzCore/QuartzCore.h>
 
 @implementation DMGridTextCell
@@ -23,7 +24,8 @@
 
 -(CALayer*)makeBackingLayer
 {
-	CATextLayer *textLayer = [[CATextLayer alloc] init];
+	//CATextLayer *textLayer = [[CATextLayer alloc] init];
+	CATextLayer *textLayer = [[DMTextLayer alloc] init];
 	textLayer.contentsScale = [[NSScreen mainScreen] backingScaleFactor];
 	return textLayer;
 }

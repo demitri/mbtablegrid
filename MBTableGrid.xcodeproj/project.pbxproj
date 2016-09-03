@@ -26,6 +26,9 @@
 		A6AF0B721CF598180037CC70 /* CellViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = A6AF0B711CF598180037CC70 /* CellViews.xib */; };
 		A6AF0B7F1CFC9B3E0037CC70 /* DMActiveCellsCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */; };
 		A6AF0B801CFC9B3E0037CC70 /* DMActiveCellsCache.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */; };
+		A6AF179C1D7AABB2009A9FBA /* DMTextLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF179A1D7AABB2009A9FBA /* DMTextLayer.h */; };
+		A6AF179D1D7AABB2009A9FBA /* DMTextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */; };
+		A6AF179E1D7AABB2009A9FBA /* DMTextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */; };
 		A6F67D601D25C54100A087C6 /* CellViewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D5F1D25C54100A087C6 /* CellViewsController.m */; };
 		A6F67D631D26D7FC00A087C6 /* PopupButtonTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D621D26D7FC00A087C6 /* PopupButtonTableCellView.m */; };
 		C63413B61A19F857001E9DF0 /* MBLevelIndicatorCell.h in Headers */ = {isa = PBXBuildFile; fileRef = C63413B41A19F857001E9DF0 /* MBLevelIndicatorCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -96,6 +99,8 @@
 		A6AF0B711CF598180037CC70 /* CellViews.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CellViews.xib; sourceTree = "<group>"; };
 		A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMActiveCellsCache.h; sourceTree = "<group>"; };
 		A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMActiveCellsCache.m; sourceTree = "<group>"; };
+		A6AF179A1D7AABB2009A9FBA /* DMTextLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMTextLayer.h; sourceTree = SOURCE_ROOT; };
+		A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMTextLayer.m; sourceTree = SOURCE_ROOT; };
 		A6F67D5E1D25C54100A087C6 /* CellViewsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CellViewsController.h; sourceTree = "<group>"; };
 		A6F67D5F1D25C54100A087C6 /* CellViewsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CellViewsController.m; sourceTree = "<group>"; };
 		A6F67D611D26D7FC00A087C6 /* PopupButtonTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopupButtonTableCellView.h; sourceTree = "<group>"; };
@@ -302,6 +307,8 @@
 				A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */,
 				A66E2A431D10F3BA006B1AA1 /* DMGridColumn.h */,
 				A66E2A441D10F3BA006B1AA1 /* DMGridColumn.m */,
+				A6AF179A1D7AABB2009A9FBA /* DMTextLayer.h */,
+				A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */,
 			);
 			path = MBTableGrid;
 			sourceTree = "<group>";
@@ -327,6 +334,7 @@
 				E2E62BFB1781C53800F36275 /* MBTableGridCell.h in Headers */,
 				C6BF268B1A4AC953008EB93F /* MBFooterPopupButtonCell.h in Headers */,
 				C639543019FF84FA0029BDF1 /* MBButtonCell.h in Headers */,
+				A6AF179C1D7AABB2009A9FBA /* DMTextLayer.h in Headers */,
 				CA46E3621A09726A00C43B4B /* MBTableGridEditable.h in Headers */,
 				C639542C19FF3B7C0029BDF1 /* MBPopupButtonCell.h in Headers */,
 				C6AB1C261A15C3AB0092B29C /* MBImageCell.h in Headers */,
@@ -441,6 +449,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
+				A6AF179D1D7AABB2009A9FBA /* DMTextLayer.m in Sources */,
 				A6F67D631D26D7FC00A087C6 /* PopupButtonTableCellView.m in Sources */,
 				C9412A5F0D8AE98C00E9E614 /* MBTableGridController.m in Sources */,
 				A6F67D601D25C54100A087C6 /* CellViewsController.m in Sources */,
@@ -464,6 +473,7 @@
 				A6AF0B701CF56AC90037CC70 /* DMTableGridCellQueue.m in Sources */,
 				C6BF268D1A4AC967008EB93F /* MBFooterPopupButtonCell.m in Sources */,
 				E2E62BBD1781C37B00F36275 /* MBTableGridHeaderCell.m in Sources */,
+				A6AF179E1D7AABB2009A9FBA /* DMTextLayer.m in Sources */,
 				E2E62BBE1781C38000F36275 /* MBTableGridCell.m in Sources */,
 				C639543219FF84FA0029BDF1 /* MBButtonCell.m in Sources */,
 				C63413B71A19F857001E9DF0 /* MBLevelIndicatorCell.m in Sources */,

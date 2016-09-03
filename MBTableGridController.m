@@ -36,6 +36,7 @@
 #import "DMTableGridCellQueue.h"
 #import "DMGridTextCell.h"
 #import "PopupButtonTableCellView.h"
+#import "DMTextLayer.h"
 
 NSString* kAutosavedColumnWidthKey = @"AutosavedColumnWidth";
 NSString* kAutosavedColumnIndexKey = @"AutosavedColumnIndex";
