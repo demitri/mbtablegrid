@@ -1312,8 +1312,6 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	[self.contentView setNeedsDisplay:YES];
 	[self.columnHeaderView setNeedsDisplay:YES];
 	[self.rowHeaderView setNeedsDisplay:YES];
-	
-	[[NSNotificationCenter defaultCenter] postNotificationName:@"MBTableGridDataReloadedNotification" object:self];
 }
 
 #pragma mark Layout Support

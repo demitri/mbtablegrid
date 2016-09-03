@@ -61,7 +61,6 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (NSCell *)_footerCellForColumn:(NSUInteger)columnIndex;
 - (id)_footerValueForColumn:(NSUInteger)columnIndex;
 - (void)_setFooterValue:(id)value forColumn:(NSUInteger)columnIndex;
-- (void)_tableGridDataReloaded:(NSNotification*)notification;
 @end
 
 #pragma mark -
@@ -100,7 +99,6 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSValue*> *rangeForColumn; // NSValue holds an NSRange
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSView*> *visibleCellsForColumn;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMGridColumn*> *gridColumns;
-- (void)updateCellSubviewsNotification:(NSNotification *)notification;
 - (void)_updateCellSubviewsInRect:(NSRect)rect;
 - (NSArray*)_observedTableGridProperties;
 @end
@@ -192,16 +190,6 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		
 		self.enclosingScrollView.contentView.postsBoundsChangedNotifications = YES;
 		
-		[nc addObserver:self
-			   selector:@selector(_tableGridDataReloaded:)
-				   name:@"MBTableGridDataReloadedNotification"
-				 object:_tableGrid]; // only receive notifications from this object
-		
-		[nc addObserver:self
-			   selector:@selector(updateCellSubviewsNotification:)
-				   name:NSViewBoundsDidChangeNotification
-				 object:self.enclosingScrollView.contentView];
-		
 		[self addObserver:self
 			   forKeyPath:@"bounds"
 				  options:NSKeyValueObservingOptionNew
@@ -256,14 +244,11 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	self.needsLayout = YES;
 	
 	self.needsDisplay = YES;
-	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
+	//[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 }
 
 - (void) dealloc {
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-	[nc removeObserver:self
-				  name:@"MBTableGridDataReloadedNotification"
-				object:_tableGrid];
 	[nc removeObserver:self];
 	
 	[self removeObserver:self forKeyPath:@"frame"];
@@ -1253,20 +1238,6 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 #pragma mark -
 #pragma mark [dm] Layout methods
 
-/*
-- (void)resizeWithOldSuperviewSize:(NSSize)oldSize {};
-
-- (void)setFrame:(NSRect)frame
-{
-	[super setFrame:frame];
-}
-
-- (void)setBounds:(NSRect)bounds
-{
-	[super setBounds:bounds];
-}
-*/
-
 - (void)resetDocumentView
 {
 	// Reset document (this class) size.
@@ -1282,15 +1253,13 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		documentWidth += [_tableGrid _widthForColumn:i];
 	}
 	
-	/*
-	self.frame = CGRectMake(0, 0,
-							documentWidth + (float)(_tableGrid.numberOfColumns - 1) * self.gridLineThickness,
-							self.rowHeight * _tableGrid.numberOfRows + (float)(_tableGrid.numberOfRows - 1) * self.gridLineThickness);
-	*/
+	// add thickness of grid lines
+	documentWidth += (float)(_tableGrid.numberOfColumns - 1) * self.gridLineThickness;
+	
 	self.heightConstraint.constant = self.rowHeight * _tableGrid.numberOfRows + (float)(_tableGrid.numberOfRows - 1) * self.gridLineThickness;
-	self.widthConstraint.constant = documentWidth + (float)(_tableGrid.numberOfColumns - 1) * self.gridLineThickness;
+	self.widthConstraint.constant = documentWidth;
 	self.needsLayout = YES;
-	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
+	//[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 }
 
 - (BOOL)wantsUpdateLayer
@@ -1298,21 +1267,15 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	return YES;
 }
 
-- (void)_tableGridDataReloaded:(NSNotification*)notification
+- (void)layout
 {
-	; //[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
-}
-
-- (void)updateCellSubviewsNotification:(NSNotification *)notification
-{
-	// update visible rect
-	//NSLog(@"updateCellSubviewsNotification");
 	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
+	[super layout];
 }
 
 - (void)_updateCellSubviewsInRect:(NSRect)rect
 {
-	NSLog(@"updateCells: %@", NSStringFromRect(rect));
+	//NSLog(@"updateCells: %@", NSStringFromRect(rect));
 	
 	NSUInteger minCol, minRow, maxCol, maxRow;
 	
@@ -2528,8 +2491,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			return;
 		}
 		else if ([keyPath isEqualToString:@"frame"]) {
-			//_frame = NSMakeRect(0, 0, 9149, 419);
-			[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
+			self.needsLayout = YES;
 			NSLog(@"content view frame changed");
 			return;
 		}
@@ -2546,27 +2508,6 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			return;
 		}
 	}
-	/*
-	else if (object == _tableGrid) {
-		//return;
-		if ([keyPath isEqualToString:@"numberOfRows"] || [keyPath isEqualToString:@"numberOfColumns"]) {
-			
-			if ([keyPath isEqualToString:@"numberOfRows"])
-				NSLog(@"New number of rows: %d", _tableGrid.numberOfRows);
-			else if ([keyPath isEqualToString:@"numberOfColumns"])
-				NSLog(@"New number of columns: %d", _tableGrid.numberOfColumns);
-			
-			//NSLog(@"clip frame: %@", NSStringFromRect(self.superview.frame));
-			
-			//[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
-			
-			[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
-			
-			//self.needsDisplay = YES;
-			return;
-		}
-	}
-	 */
 	
 	[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
