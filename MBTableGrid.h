@@ -215,7 +215,7 @@ typedef enum {
  *
  */
 
-@property (nonatomic, strong) NSMutableDictionary *columnRects;
+@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSValue*> *columnRects;
 
 
 - (void) resizeColumnWithIndex:(NSUInteger)columnIndex width:(float)w;

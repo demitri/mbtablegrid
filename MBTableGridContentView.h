@@ -73,7 +73,7 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
 	
 	MBTableGridCell *_defaultCell;
     
-    NSMutableArray *columnWidths;
+    //NSMutableArray *columnWidths;
     
 }
 
@@ -197,6 +197,10 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
  */
 
 - (void)updateCellSubviewsNotification:(NSNotification *)notification;
+- (void)resetDocumentView;
+
+@property (nonatomic, strong) NSLayoutConstraint *widthConstraint;
+@property (nonatomic, strong) NSLayoutConstraint *heightConstraint;
 
 
 @end

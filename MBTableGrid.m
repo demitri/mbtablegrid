@@ -1238,7 +1238,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     }
 }
 
-- (void)reloadData {
+- (void)reloadData
+{
 	CGRect visibleRect = contentScrollView.contentView.documentVisibleRect;
 	
 	// Set number of columns
@@ -1259,6 +1260,9 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
     
     [self populateColumnInfo];
 
+	[self.columnRects removeAllObjects];
+	[self.contentView resetDocumentView];
+	
 	// Update the content view's size
     NSUInteger lastColumn = (_numberOfColumns > 0) ? _numberOfColumns-1 : 0;
     NSUInteger lastRow = (_numberOfRows > 0) ? _numberOfRows-1 : 0;
@@ -1305,6 +1309,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	[self.contentView setNeedsDisplay:YES];
 	[self.columnHeaderView setNeedsDisplay:YES];
 	[self.rowHeaderView setNeedsDisplay:YES];
+	
+	[[NSNotificationCenter defaultCenter] postNotificationName:@"MBTableGridDataReloadedNotification" object:self];
 }
 
 #pragma mark Layout Support

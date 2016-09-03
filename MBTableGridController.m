@@ -147,7 +147,7 @@ NSString * const ColumnText4 = @"text4";
     
 	// Add 10 columns & rows
     [self tableGrid:self.tableGrid addColumns:150 shouldReload:NO];
-    [self tableGrid:self.tableGrid addRows:150 shouldReload:NO];
+    [self tableGrid:self.tableGrid addRows:70 shouldReload:NO];
 	
 	[self.tableGrid setIndicatorImage:[NSImage imageNamed:@"sort-asc"] reverseImage:[NSImage imageNamed:@"sort-desc"] inColumns:@[@1,@3]];
 	
