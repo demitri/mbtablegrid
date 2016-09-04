@@ -1370,7 +1370,22 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	return rect;
 }
 
-- (NSInteger)columnAtPoint:(NSPoint)aPoint {
+- (NSInteger)columnAtPoint:(NSPoint)aPoint
+{
+	NSUInteger column = 0;
+	while (column < _numberOfColumns) {
+		NSRect columnFrame = [self rectOfColumn:column];
+		if (aPoint.x <= columnFrame.origin.x + columnFrame.size.width) // TODO account for grid lines?
+			return column;
+		else
+			column++;
+	}
+	
+	NSAssert(FALSE, @"column not found");
+	return NSNotFound;
+	
+	// This fails when the point value lies between pixels.
+	/*
 	NSInteger column = 0;
 	while (column < _numberOfColumns) {
 		NSRect columnFrame = [self rectOfColumn:column];
@@ -1379,7 +1394,10 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		}
 		column++;
 	}
+
+	 NSAssert(FALSE, @"column not found");
 	return NSNotFound;
+	 */
 }
 
 - (NSInteger)rowAtPoint:(NSPoint)aPoint {

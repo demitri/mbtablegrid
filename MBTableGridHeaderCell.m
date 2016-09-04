@@ -133,7 +133,7 @@
 	NSRect textFrame;
 	CGSize stringSize = self.attributedStringValue.size;
 	
-	NSAttributedString *stringToDraw;
+	NSAttributedString *stringToDraw = self.attributedStringValue;
 	
 	if (self.orientation == MBTableHeaderHorizontalOrientation)
 	{
@@ -142,7 +142,6 @@
 								   cellFrameRect.origin.y + (cellFrameRect.size.height - stringSize.height)/2,
 								   cellFrameRect.size.width - TEXT_PADDING,
 								   stringSize.height);
-			stringToDraw = self.attributedStringValue;
 		}
 		else {
 			textFrame = NSMakeRect(cellFrameRect.origin.x + TEXT_PADDING, // + (cellFrameRect.size.width - stringSize.width)/2,

@@ -2466,7 +2466,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSUInteger columnNumber = 0;
 	while (column == NSNotFound && columnNumber < _tableGrid.numberOfColumns) {
 		NSRect columnFrame = [self rectOfColumn:columnNumber];
-		//if (NSPointInRect(aPoint, columnFrame))
+		//if (NSPointInRect(aPoint, columnFrame)) <-- doesn't catch points in between integer column edges
 		if (aPoint.x <= columnFrame.origin.x + columnFrame.size.width + self.gridLineThickness) // point on grid line counts column before it
 			column = columnNumber;
 		else
@@ -2474,19 +2474,18 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	}
 	return column;
 	
-	/*
-	NSUInteger column = NSNotFound;
-	NSUInteger c = 0;
-	while(column == NSNotFound && c < self.tableGrid.numberOfColumns) {
-		NSRect columnFrame = [self rectOfColumn:c];
-		if(aPoint.x >= columnFrame.origin.x && aPoint.x <= (columnFrame.origin.x + columnFrame.size.width)) {
-			column = c;
-		}
-		c++;
-	}
-	return column;
-	 */
+//	NSUInteger column = NSNotFound;
+//	NSUInteger c = 0;
+//	while(column == NSNotFound && c < self.tableGrid.numberOfColumns) {
+//		NSRect columnFrame = [self rectOfColumn:c];
+//		if(aPoint.x >= columnFrame.origin.x && aPoint.x <= (columnFrame.origin.x + columnFrame.size.width)) {
+//			column = c;
+//		}
+//		c++;
+//	}
+//	return column;
 }
+
 
 - (NSUInteger)rowAtPoint:(NSPoint)aPoint
 {
