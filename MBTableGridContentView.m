@@ -95,7 +95,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //@property (nonatomic, strong) NSMutableDictionary *activeTableCells; // key: indexPath value: {"view":view,"id":cellIdentifier}
 @property (nonatomic, strong) NSMutableDictionary *activeTableCells; // key: @(colNum) value: NSMutableArray <key:rowNum value:cellView>
 @property (nonatomic, strong) NSMutableDictionary *visibleCells; // key: NSIndexPath value: view
-@property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMGridStackView*> *stackViewForColumn;
+//@property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMGridStackView*> *stackViewForColumn;
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSValue*> *rangeForColumn; // NSValue holds an NSRange
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSView*> *visibleCellsForColumn;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMGridColumn*> *gridColumns;
@@ -143,7 +143,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 		self.activeTableCells = [NSMutableDictionary dictionary];
 		self.activeCellsCache = [[DMActiveCellsCache alloc] init];
-		self.stackViewForColumn = [NSMutableDictionary dictionary]; // [dm]
+		//self.stackViewForColumn = [NSMutableDictionary dictionary]; // [dm]
 		self.gridColumns = [NSMutableDictionary dictionary]; // [dm]
 		
 		
@@ -158,10 +158,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		[_defaultCell setScrollable:YES];
 		[_defaultCell setLineBreakMode:NSLineBreakByTruncatingTail];
 		
-		NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-
 		/*
-		[nc addObserver:self
+		[[NSNotificationCenter defaultCenter] addObserver:self
 			   selector:@selector(mylistener:)
 				   name:@"NSMenuDidChangeItemNotification"
 				 object:nil];
@@ -790,7 +788,57 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //		int i;
 //	}
 	
+	// Draw background grid
+	// --------------------
+	NSArray *visibleRanges = [self rangesOfVisibleColumnsAndRowsInRect:rect];
+	NSRange visibleColumns = [visibleRanges[0] rangeValue];
+	NSRange visibleRows = [visibleRanges[1] rangeValue];
+	
+	CGFloat gridX = 0;
+	for (NSUInteger i=0; i < visibleColumns.location; i++) {
+		gridX += [_tableGrid _widthForColumn:i];
+	}
+	
+	NSColor *gridColor = [NSColor colorWithCalibratedWhite:0.878 alpha:1.000];
+	[gridColor set];
+	[NSBezierPath setDefaultLineWidth:0.5];
+
+	// Note that Cocoa coordinates specify the center of the pixel to draw.
+	
+	// draw vertical lines
+	for (NSUInteger i=visibleColumns.location; i < visibleColumns.location + visibleColumns.length; i++) {
+		NSRect columnRect = [self rectOfColumn:i];
+		CGFloat x = NSMaxX(columnRect) - 0.5;
+		NSPoint startPoint = NSMakePoint(x, NSMinY(rect));
+		NSPoint endPoint   = NSMakePoint(x, NSMaxY(rect));
+		[NSBezierPath strokeLineFromPoint:startPoint toPoint:endPoint];
+	}
+	
+	// draw horizontal lines
+	for (NSUInteger i=visibleRows.location; i < visibleRows.location + visibleRows.length + 1; i++) {
+
+		NSRect rowRect = [self rectOfRow:i];
+		
+		// don't draw horizontal lines if filling in alternating rows
+		if (0) {
+			//CGFloat y = i * self.rowHeight + (i * self.gridLineThickness -1) - 0.5; // could also have used [self rectOfRow:i]
+			CGFloat y = NSMaxY(rowRect) - 0.5;
+			NSPoint startPoint = NSMakePoint(NSMinX(rect), y);
+			NSPoint endPoint   = NSMakePoint(NSMaxX(rect), y);
+	//		[NSBezierPath strokeRect:rowRect];
+			[NSBezierPath strokeLineFromPoint:startPoint toPoint:endPoint];
+		}
+		
+		// background color on alternating rows
+		if (i % 2 == 0) {
+			[NSBezierPath fillRect:NSMakeRect(rowRect.origin.x-0.5, rowRect.origin.y-1,
+											  rowRect.size.width, rowRect.size.height+1)];
+		}
+	}
+	
+	
 	// Draw the selection rectangle
+	// ----------------------------
 	if(selectedColumns.count && selectedRows.count && _tableGrid.numberOfColumns > 0 && _tableGrid.numberOfRows > 0)
 	{
 		NSRect selectionTopLeft = [self frameOfCellAtColumn:selectedColumns.firstIndex row:selectedRows.firstIndex];
@@ -1266,7 +1314,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	}
 	
 	// add thickness of grid lines
-	documentWidth += (float)(_tableGrid.numberOfColumns - 1) * self.gridLineThickness;
+	documentWidth += (float)(_tableGrid.numberOfColumns - 1) * self.gridLineThickness + self.gridLineThickness; // add extra grid thickness for right border
 	
 	self.heightConstraint.constant = self.rowHeight * _tableGrid.numberOfRows + (float)(_tableGrid.numberOfRows - 1) * self.gridLineThickness;
 	self.widthConstraint.constant = documentWidth;
@@ -1283,6 +1331,53 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 {
 	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 	[super layout];
+}
+
+- (NSArray<NSValue*>*)rangesOfVisibleColumnsAndRowsInRect:(NSRect)rect
+{
+	NSUInteger minCol, minRow, maxCol, maxRow;
+	
+	// Determine min/max row columns
+	// -----------------------------
+	if (_tableGrid.numberOfColumns == 0 || _tableGrid.numberOfRows == 0) {
+		minCol = 0;
+		maxCol = 0;
+		minRow = 0;
+		maxRow = 0;
+	} else {
+		// get row, column from given rect
+		//
+		NSRect unbouncyRect = rect;
+		unbouncyRect.origin.y = MAX(unbouncyRect.origin.y, 0);
+		unbouncyRect.origin.x = MAX(unbouncyRect.origin.x, 0);
+		
+		NSPoint rectDiagonalPoint = NSMakePoint(unbouncyRect.origin.x + unbouncyRect.size.width,
+												unbouncyRect.origin.y + unbouncyRect.size.height);
+		minCol = [self columnAtPoint:unbouncyRect.origin];
+		maxCol = [self columnAtPoint:rectDiagonalPoint];
+		minRow = [self rowAtPoint:unbouncyRect.origin];
+		maxRow = [self rowAtPoint:rectDiagonalPoint] + 1;
+		
+		// If the number of rows/columns don't fill the visible clip view,
+		// NSNotFound will be returned (but is not a mistake!).
+		
+		if (maxRow == NSNotFound)
+			maxRow = _tableGrid.numberOfRows - 1;
+		else if (maxRow >= _tableGrid.numberOfRows)
+			maxRow = _tableGrid.numberOfRows - 1;
+		
+		if (maxCol == NSNotFound)
+			maxCol = _tableGrid.numberOfColumns - 1;
+		else if (maxCol >= _tableGrid.numberOfColumns)
+			maxCol = _tableGrid.numberOfColumns - 1;
+		
+		NSAssert(minCol >= 0 && minCol <= _tableGrid.numberOfColumns, @"bad min column");
+		NSAssert(minRow >= 0 && minRow <= _tableGrid.numberOfRows, @"bad min row");
+		NSAssert(maxCol < _tableGrid.numberOfColumns, @"bad max column");
+		NSAssert(maxRow < _tableGrid.numberOfRows, @"bad max row");
+	}
+	return @[[NSValue valueWithRange:NSMakeRange(minCol, maxCol-minCol+1)],
+			 [NSValue valueWithRange:NSMakeRange(minRow, maxRow-minRow+1)]];
 }
 
 - (void)_updateCellSubviewsInRect:(NSRect)rect
@@ -1365,7 +1460,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		 */
 		
 		NSAssert(minCol >= 0 && minCol <= _tableGrid.numberOfColumns, @"bad min column");
-		NSAssert(minRow >= 0 && minRow <= _tableGrid.numberOfRows, @"bad min column");
+		NSAssert(minRow >= 0 && minRow <= _tableGrid.numberOfRows, @"bad min row");
 		NSAssert(maxCol < _tableGrid.numberOfColumns, @"bad max column");
 		NSAssert(maxRow < _tableGrid.numberOfRows, @"bad max row");
 		
@@ -1566,6 +1661,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	//self.needsDisplay = YES;
 }
 
+/*
 - (void)updateCellSubviews2:(NSNotification*)notification
 {
 	//NSLog(@"self.bounds: %@", NSStringFromRect(self.bounds));
@@ -1596,12 +1692,6 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSAssert(minRow != NSNotFound, @"minRow not found");
 	NSAssert(maxRow != NSNotFound, @"maxRow not found");
 
-	/*
-	if (maxRow >= [_tableGrid numberOfRows])
-		maxRow = [_tableGrid numberOfRows] - 1;
-	if (maxCol >= [_tableGrid numberOfColumns])
-		maxCol = [_tableGrid numberOfColumns] - 1;
-*/
 	
 	NSAssert(minCol >= 0 && minCol < [_tableGrid numberOfColumns], @"bad min column");
 	NSAssert(minRow >= 0 && minRow < [_tableGrid numberOfRows], @"bad min column");
@@ -1640,20 +1730,20 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	
 	// determine which cells are visible, which are becoming visible now, and which are being moved out of view
 	// --------------------------------------------------------------------------------------------------------
-	/*
-	NSArray *oldVisibleIndexPaths = self.visibleCells.allKeys; // save current index paths of visible cells
+	
+	//NSArray *oldVisibleIndexPaths = self.visibleCells.allKeys; // save current index paths of visible cells
 
 	// build list of current visible index paths
-	NSMutableArray *newVisibleIndexPaths = [NSMutableArray array];
-	for (NSUInteger col=minCol; col < maxCol+1; col++)
-	{
-		for (int row=minRow; row < maxRow+1; row++) {
-			NSUInteger indices[] = {col, row};
-			NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
-			[newVisibleIndexPaths addObject:indexPath];
-		}
-	}
-	 */
+	//NSMutableArray *newVisibleIndexPaths = [NSMutableArray array];
+	//for (NSUInteger col=minCol; col < maxCol+1; col++)
+	//{
+	//	for (int row=minRow; row < maxRow+1; row++) {
+	//		NSUInteger indices[] = {col, row};
+	//		NSIndexPath *indexPath = [NSIndexPath indexPathWithIndexes:indices length:2];
+	//		[newVisibleIndexPaths addObject:indexPath];
+	//	}
+	//}
+	
 
 	// determine which index paths were visible and are no longer
 	//NSMutableArray *indexPathsToRemove = [NSMutableArray arrayWithArray:oldVisibleIndexPaths];
@@ -1686,15 +1776,15 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				
 				//NSLog(@"reusing stackView: %d", stackView.column);
 
-				/*
+				
 				// make any cells in the view available for reuse
-				while (stackView.views.count > 0) {
-					NSView *view = stackView.views.firstObject;
-					[view removeFromSuperview];
-					[_tableGrid enqueueView:view forIdentifier:view.identifier];
-				}
-				stackView.rowsInStack = NSMakeRange(0,0);
-				 */
+				//while (stackView.views.count > 0) {
+				//	NSView *view = stackView.views.firstObject;
+				//	[view removeFromSuperview];
+				//	[_tableGrid enqueueView:view forIdentifier:view.identifier];
+				//}
+				//stackView.rowsInStack = NSMakeRange(0,0);
+				 
 			} else {
 				// no stack views available for reuse; make a new one
 				//
@@ -1717,15 +1807,15 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 				[self addSubview:stackView];
 				
-				/*
-				 //NSDictionary *views = NSDictionaryOfVariableBindings(stackView);
-				[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[stackView]|"
-																			 options:0
-																			 metrics:nil
-																			   views:views]];
-				*/
-				//stackView.spacerView = [[NSView alloc] initWithFrame:NSMakeRect(0,0,100,100)];
-				//[stackView addView:stackView.spacerView inGravity:NSStackViewGravityTop];
+				
+				// //NSDictionary *views = NSDictionaryOfVariableBindings(stackView);
+				//[self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|[stackView]|"
+				//															 options:0
+				//															 metrics:nil
+				//															   views:views]];
+				//
+				////stackView.spacerView = [[NSView alloc] initWithFrame:NSMakeRect(0,0,100,100)];
+				////[stackView addView:stackView.spacerView inGravity:NSStackViewGravityTop];
 			}
 			
 			// set up constraints for this stack view
@@ -1741,17 +1831,17 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 																		  constant:cellFrame.size.width]; // set in updateConstraints
 				[stackView addConstraints:@[stackView.widthConstraint]];
 				
-				/*
-				 NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:stackView
-				 attribute:NSLayoutAttributeHeight
-				 relatedBy:NSLayoutRelationEqual
-				 toItem:self
-				 attribute:NSLayoutAttributeHeight
-				 multiplier:1.0f
-				 constant:0.0f];
-				 heightConstraint.priority = NSLayoutPriorityDefaultHigh;
-				 [self addConstraints:@[heightConstraint]];
-				 */
+				
+				// NSLayoutConstraint *heightConstraint = [NSLayoutConstraint constraintWithItem:stackView
+				// attribute:NSLayoutAttributeHeight
+				// relatedBy:NSLayoutRelationEqual
+				// toItem:self
+				// attribute:NSLayoutAttributeHeight
+				// multiplier:1.0f
+				// constant:0.0f];
+				// heightConstraint.priority = NSLayoutPriorityDefaultHigh;
+				// [self addConstraints:@[heightConstraint]];
+				
 			}
 			//stackView.widthConstraint.constant = cellFrame.size.width;
 			
@@ -1912,6 +2002,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	self.needsLayout = needsLayout;
 	[self.window layoutIfNeeded];
 }
+*/
 
 /*
 - (void)updateConstraints
@@ -2381,11 +2472,11 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		for (NSUInteger i=0; i < columnIndex + 1; i++) {
 			cachedRectValue = _tableGrid.columnRects[@(i)];
 			if (cachedRectValue == nil) {
-				NSRect columnRect = NSMakeRect(x, 0, [_tableGrid _widthForColumn:i], self.frame.size.height);
+				NSRect columnRect = NSMakeRect(x, 0, [_tableGrid _widthForColumn:i] + self.gridLineThickness, self.frame.size.height);
 				cachedRectValue = [NSValue valueWithRect:columnRect];
 				_tableGrid.columnRects[@(i)] = cachedRectValue;
 			}
-			x += cachedRectValue.rectValue.size.width + self.gridLineThickness;
+			x += cachedRectValue.rectValue.size.width;
 		}
 
 		columnRect = _tableGrid.columnRects[@(columnIndex)].rectValue;
@@ -2440,15 +2531,15 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	//CGFloat horizontalGridLines = (columnIndex == 0) ? 0.0f : (float)columnIndex - 1.0f;
 	//CGFloat verticalGridLines = (rowIndex == 0) ? 0.0f : (float)rowIndex - 1.0f;
 
-	// calculate widths of all columns before the one being requested (excluding the gridLineThickness)
-	NSUInteger x = 0;
-	NSUInteger width;
+	// calculate widths of all columns before the one being requested
+	CGFloat x = 0;
 	for (NSUInteger i=0; i < columnIndex; i++) {
-		width = [self rectOfColumn:i].size.width;
-		x += width;
+		x += [self rectOfColumn:i].size.width; // includes grid line thickness
 	}
 	
-	return NSMakeRect(/*(float)columnIndex * width*/ (float)x + (float)columnIndex * self.gridLineThickness,
+	//x += columnIndex * self.gridLineThickness; // add grid lines
+	
+	return NSMakeRect(/*(float)columnIndex * width*/ (float)x,
 					  (float)rowIndex * self.rowHeight + (float)rowIndex * self.gridLineThickness,
 					  [self rectOfColumn:columnIndex].size.width,
 					  self.rowHeight);
@@ -2511,7 +2602,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		}
 		else if ([keyPath isEqualToString:@"frame"]) {
 			self.needsLayout = YES;
-			NSLog(@"content view frame changed");
+			//NSLog(@"content view frame changed");
 			return;
 		}
 	}

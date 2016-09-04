@@ -143,6 +143,9 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 {
 	if (self.orientation == MBTableHeaderHorizontalOrientation) {
  
+		// NOTE: The headerCell is of type MBTableGridHeaderCell, which is responsible for drawing the
+		//       hotizontal/vertical divider line between cells.
+		
         // Remove all tracking areas
 		for (NSTrackingArea *trackingArea in self.trackingAreas) {
 			[self removeTrackingArea:trackingArea];
@@ -190,15 +193,19 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
         
 	} else if (self.orientation == MBTableHeaderVerticalOrientation) {
 		
+		NSLog(@"rect: %@", NSStringFromRect(rect));
 		// Draw the row headers
 		NSUInteger numberOfRows = self.tableGrid.numberOfRows;
 		[headerCell setOrientation:self.orientation];
 
+		CGFloat gridLineThickness = self.tableGrid.contentView.gridLineThickness;
+		
 		CGFloat rowHeight = self.tableGrid.contentView.rowHeight;
-		NSUInteger row = MAX(0, floor(rect.origin.y / rowHeight));
-		NSUInteger endRow = MIN(numberOfRows, ceil((rect.origin.y + rect.size.height) / rowHeight));
+		NSUInteger rowNum = MAX(0, floor(rect.origin.y / (rowHeight + gridLineThickness)));
+		NSUInteger endRow = MIN(numberOfRows, ceil((rect.origin.y + rect.size.height) / (rowHeight + gridLineThickness)));
 
-		while(row < endRow) {
+//		while(row < endRow) {
+		for (NSUInteger row=rowNum; row < endRow; row++) {
 			NSRect headerRect = [self headerRectOfRow:row];
 			
 			// Only draw the header if we need to
@@ -209,8 +216,9 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 				
 				headerCell.stringValue = [self.tableGrid _headerStringForRow:row];
 				[headerCell drawWithFrame:headerRect inView:self];
+				//NSLog(@"row: %lu > %@ (%@)", row, NSStringFromRect(headerRect), [self.tableGrid _headerStringForRow:row]);
 			}
-			row++;
+			//row++;
 		}
 	}
 	

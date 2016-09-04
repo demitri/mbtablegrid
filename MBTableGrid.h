@@ -25,8 +25,8 @@
 
 #import <Cocoa/Cocoa.h>
 #import <QuartzCore/QuartzCore.h>
-#import "DMTableGridCellQueue.h"
-#import "MBTableGridContentView.h"
+#import <MBTableGrid/DMTableGridCellQueue.h>
+#import <MBTableGrid/MBTableGridContentView.h>
 
 @class MBTableGridHeaderView, MBTableGridFooterView, MBTableGridHeaderCell; //, MBTableGridContentView;
 @protocol MBTableGridDelegate, MBTableGridDataSource;
@@ -1110,11 +1110,12 @@ cells. A cell can individually override this behavior. */
  */
 @protocol MBTableGridDelegate <NSObject>
 
-// Being a delegate, the entire protocol is optional
-@optional
-
+@required
 #pragma mark [dm]
 - (NSView*)tableGrid:(MBTableGrid*)tableGrid viewForTableColumn:(NSUInteger)columnIndex andRow:(NSUInteger)row;
+
+// Being a delegate, the entire protocol is optional
+@optional
 
 #pragma mark -
 #pragma mark Managing Selections

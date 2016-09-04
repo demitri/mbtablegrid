@@ -32,7 +32,6 @@
 #import "MBImageCell.h"
 #import "MBButtonCell.h"
 #import "MBPopupButtonCell.h"
-//#import "JNWScrollView.h"
 
 #pragma mark -
 #pragma mark Constant Definitions
@@ -1372,14 +1371,22 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 - (NSInteger)columnAtPoint:(NSPoint)aPoint
 {
+	// account for row header
+	aPoint.x -= self.rowHeaderView.frame.size.width;
+	
 	NSUInteger column = 0;
 	while (column < _numberOfColumns) {
 		NSRect columnFrame = [self rectOfColumn:column];
-		if (aPoint.x <= columnFrame.origin.x + columnFrame.size.width) // TODO account for grid lines?
+		if (floor(aPoint.x) <= columnFrame.origin.x + columnFrame.size.width) // TODO account for grid lines?
 			return column;
 		else
 			column++;
 	}
+	
+	// check that the point is only a few pixels from the right edge
+	// - this can happen when resizing the last column
+	//if (aPoint.x > self.contentView.frame.size.width - 1 && aPoint.x < self.contentView.frame.size.width + 5)
+	//	return _numberOfColumns - 1;
 	
 	NSAssert(FALSE, @"column not found");
 	return NSNotFound;

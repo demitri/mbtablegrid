@@ -24,7 +24,7 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "DMGridStackView.h"
+//#import "DMGridStackView.h"
 
 #define MBTableGridColumnHeaderHeight 24.0
 #define MBTableGridColumnHeaderWidth 60
