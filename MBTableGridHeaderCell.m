@@ -129,14 +129,29 @@
 {
 	NSRect cellFrameRect = cellFrame;
 
-	static CGFloat TEXT_PADDING = 6;
+	static CGFloat TEXT_PADDING = 4;
 	NSRect textFrame;
 	CGSize stringSize = self.attributedStringValue.size;
-	if (self.orientation == MBTableHeaderHorizontalOrientation) {
-		textFrame = NSMakeRect(cellFrameRect.origin.x + TEXT_PADDING,
-							   cellFrameRect.origin.y + (cellFrameRect.size.height - stringSize.height)/2,
-							   cellFrameRect.size.width - TEXT_PADDING,
-							   stringSize.height);
+	
+	NSAttributedString *stringToDraw;
+	
+	if (self.orientation == MBTableHeaderHorizontalOrientation)
+	{
+		if (stringSize.width < cellFrame.size.width) {
+			textFrame = NSMakeRect(cellFrameRect.origin.x + (cellFrameRect.size.width - stringSize.width)/2,
+								   cellFrameRect.origin.y + (cellFrameRect.size.height - stringSize.height)/2,
+								   cellFrameRect.size.width - TEXT_PADDING,
+								   stringSize.height);
+			stringToDraw = self.attributedStringValue;
+		}
+		else {
+			textFrame = NSMakeRect(cellFrameRect.origin.x + TEXT_PADDING, // + (cellFrameRect.size.width - stringSize.width)/2,
+								   cellFrameRect.origin.y + (cellFrameRect.size.height - stringSize.height)/2,
+								   cellFrameRect.size.width - 2*TEXT_PADDING,
+								   stringSize.height);
+			stringToDraw = [self string:self.attributedStringValue byTruncatingToWidth:cellFrame.size.width];
+		}
+
 	} else {
 		textFrame = NSMakeRect(cellFrameRect.origin.x + (cellFrameRect.size.width - stringSize.width)/2,
 							   cellFrameRect.origin.y + (cellFrameRect.size.height - stringSize.height)/2,
@@ -148,9 +163,38 @@
 
 	[self.textShadow set];
 
-	[self.attributedStringValue drawWithRect:textFrame options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin];
+	[stringToDraw drawWithRect:textFrame options:NSStringDrawingTruncatesLastVisibleLine | NSStringDrawingUsesLineFragmentOrigin];
 	
 	[[NSGraphicsContext currentContext] restoreGraphicsState];
+}
+
+- (NSAttributedString*)string:(NSAttributedString*)string byTruncatingToWidth:(CGFloat)width
+{
+	// Create copy that will be the returned result
+	NSAttributedString *truncatedString = [[NSAttributedString alloc] initWithAttributedString:string];
+ 
+	NSDictionary *fontAttributes = [string fontAttributesInRange:NSMakeRange(0, 1)];
+	
+	// Make sure string is longer than requested width
+	if (string.size.width > width)
+	{
+		// Accommodate for ellipsis we'll tack on the end
+		width -= [@"…" sizeWithAttributes:fontAttributes].width;
+		
+		// Loop, deleting characters until string fits within width
+		NSRange range = NSMakeRange(0, truncatedString.length-1);
+		while (truncatedString.size.width > width) {
+			range.length--;
+			truncatedString = [truncatedString attributedSubstringFromRange:range];
+		}
+		
+		// Append ellipsis
+		truncatedString = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@…", truncatedString.string]
+														  attributes:fontAttributes];
+		
+	}
+	
+	return truncatedString;
 }
 
 @end

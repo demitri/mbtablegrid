@@ -140,7 +140,7 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 - (void)drawRect:(NSRect)rect
 {
 	if (self.orientation == MBTableHeaderHorizontalOrientation) {
-        
+ 
         // Remove all tracking areas
 		for (NSTrackingArea *trackingArea in self.trackingAreas) {
 			[self removeTrackingArea:trackingArea];
@@ -187,6 +187,7 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 		}
         
 	} else if (self.orientation == MBTableHeaderVerticalOrientation) {
+		
 		// Draw the row headers
 		NSUInteger numberOfRows = self.tableGrid.numberOfRows;
 		[headerCell setOrientation:self.orientation];
