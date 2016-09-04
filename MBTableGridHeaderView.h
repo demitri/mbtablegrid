@@ -183,4 +183,7 @@
  * @}
  */
 
+// TODO: make this a delegate method
+@property (nonatomic, assign) BOOL headerIsSelectable;
+
 @end

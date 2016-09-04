@@ -33,6 +33,7 @@
 #import "MBLevelIndicatorCell.h"
 #import "MBFooterTextCell.h"
 #import "MBFooterPopupButtonCell.h"
+#import "MBTableGridHeaderView.h"
 #import "DMTableGridCellQueue.h"
 #import "DMGridTextCell.h"
 #import "PopupButtonTableCellView.h"
@@ -114,6 +115,10 @@ NSString * const ColumnText4 = @"text4";
 		return view;
 	}];
 	
+	// TODO: fix: this should be a delegate method
+	self.tableGrid.columnHeaderView.headerIsSelectable = NO;
+	self.tableGrid.rowHeaderView.headerIsSelectable = NO;
+	
 	/*
 	[self.tableGrid registerNib:[[NSNib alloc] initWithNibNamed:@"CellViews" bundle:nil]
 				  forIdentifier:@"BasicCellView"
@@ -146,7 +151,7 @@ NSString * const ColumnText4 = @"text4";
 	dateFormatter.timeStyle = NSDateFormatterNoStyle;
     formatters = @{ColumnCurrency : decimalFormatter, ColumnDate : dateFormatter};
     
-	// Add 10 columns & rows
+	// Add columns & rows
     [self tableGrid:self.tableGrid addColumns:150 shouldReload:NO];
     [self tableGrid:self.tableGrid addRows:70 shouldReload:NO];
 	
@@ -516,6 +521,11 @@ NSString * const ColumnText4 = @"text4";
     if (itemIndex >= 0) {
         [[NSUserDefaults standardUserDefaults] setInteger:itemIndex forKey:[self footerDefaultsKeyForColumn:columnIndex]];
     }
+}
+
+- (void)tableGrid:(MBTableGrid *)aTableGrid footerCellClicked:(NSCell *)cell forColumn:(NSUInteger)columnIndex withEvent:(NSEvent *)theEvent
+{
+	return;
 }
 
 #pragma mark Dragging

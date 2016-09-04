@@ -93,7 +93,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 
 @interface MBTableGrid ()
 @property (nonatomic, strong) DMTableGridCellQueue *cellQueue;
-@property (nonatomic, strong) MBTableGridHeaderView *columnHeaderView;
+//@property (nonatomic, strong) MBTableGridHeaderView *columnHeaderView;
 @end
 
 @implementation MBTableGrid
@@ -144,7 +144,7 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 		columnFooterScrollView.contentView.wantsLayer = YES; // [dm]
 		columnHeaderScrollView.horizontalScrollElasticity = NSScrollElasticityNone;
 		columnHeaderScrollView.verticalScrollElasticity = NSScrollElasticityNone;
-		self.columnHeaderView = [[MBTableGridHeaderView alloc] initWithFrame:NSMakeRect(0, 0,
+		_columnHeaderView = [[MBTableGridHeaderView alloc] initWithFrame:NSMakeRect(0, 0,
 																				   columnHeaderFrame.size.width,
 																				   columnHeaderFrame.size.height)
 														   andTableGrid:self];
@@ -243,8 +243,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 												   object:contentScrollView.contentView];
         
 		// Set the default selection
-		self.selectedColumnIndexes = [NSIndexSet indexSetWithIndex:0];
-		self.selectedRowIndexes = [NSIndexSet indexSetWithIndex:0];
+		//self.selectedColumnIndexes = [NSIndexSet indexSetWithIndex:0];
+		//self.selectedRowIndexes = [NSIndexSet indexSetWithIndex:0];
 		self.allowsMultipleSelection = YES;
 
 		// Set the default sticky edges

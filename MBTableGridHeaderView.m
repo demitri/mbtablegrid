@@ -67,6 +67,8 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
         // No resize at start
         canResize = NO;
         isResizing = NO;
+		
+		self.headerIsSelectable = YES;
 	}
 	return self;
 }
@@ -228,7 +230,8 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 	NSInteger row = [self.tableGrid rowAtPoint:loc];
 
 	if([theEvent clickCount] == 2 && !rightMouse) {
-		[self.tableGrid.delegate tableGrid:self.tableGrid didDoubleClickColumn:column];
+		if ([self.tableGrid.delegate respondsToSelector:@selector(tableGrid:didDoubleClickColumn:)])
+			[self.tableGrid.delegate tableGrid:self.tableGrid didDoubleClickColumn:column];
 	}
 	else {
 		if (canResize) {
@@ -239,37 +242,53 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
 			
 		} else {
 		
-			// For single clicks,
+			// -----------------
+			// For single clicks
+			// -----------------
 			if (theEvent.clickCount == 1) {
-				if ((theEvent.modifierFlags & NSShiftKeyMask) && self.tableGrid.allowsMultipleSelection) {
+				if ((theEvent.modifierFlags & NSShiftKeyMask) && self.tableGrid.allowsMultipleSelection)
+				{
 					// If the shift key was held down, extend the selection
+					;
 				} else {
 					// No modifier keys, so change the selection
-					if(self.orientation == MBTableHeaderHorizontalOrientation) {
+					//
+					if (self.orientation == MBTableHeaderHorizontalOrientation)
+					{
 						mouseDownItem = column;
 						
-						if([self.tableGrid.selectedColumnIndexes containsIndex:column] && self.tableGrid.selectedRowIndexes.count == self.tableGrid.numberOfRows) {
+						if ([self.tableGrid.selectedColumnIndexes containsIndex:column] && self.tableGrid.selectedRowIndexes.count == self.tableGrid.numberOfRows) {
 							// Allow the user to drag the column
 							shouldDragItems = YES;
 						} else {
-							self.tableGrid.selectedColumnIndexes = [NSIndexSet indexSetWithIndex:column];
-							// Select every row
-							self.tableGrid.selectedRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,self.tableGrid.numberOfRows)];
+							if (self.headerIsSelectable) {
+								self.tableGrid.selectedColumnIndexes = [NSIndexSet indexSetWithIndex:column];
+								// Select every row
+								self.tableGrid.selectedRowIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,self.tableGrid.numberOfRows)];
+							}
 						}
-					} else if(self.orientation == MBTableHeaderVerticalOrientation) {
+					}
+					else if (self.orientation == MBTableHeaderVerticalOrientation) {
 						mouseDownItem = row;
 						
-						if([self.tableGrid.selectedRowIndexes containsIndex:row] && self.tableGrid.selectedColumnIndexes.count == self.tableGrid.numberOfColumns) {
+						if ([self.tableGrid.selectedRowIndexes containsIndex:row] && self.tableGrid.selectedColumnIndexes.count == self.tableGrid.numberOfColumns) {
 							// Allow the user to drag the row
 							shouldDragItems = YES;
 						} else {
-							self.tableGrid.selectedRowIndexes = [NSIndexSet indexSetWithIndex:row];
-							// Select every column
-							self.tableGrid.selectedColumnIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,self.tableGrid.numberOfColumns)];
+							if (self.headerIsSelectable) {
+								self.tableGrid.selectedRowIndexes = [NSIndexSet indexSetWithIndex:row];
+								// Select every column
+								self.tableGrid.selectedColumnIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0,self.tableGrid.numberOfColumns)];
+							}
 						}
 					}
 				}
+			// ------------
+			// double click
+			// ------------
 			} else if ([theEvent clickCount] == 2) {
+				
+				;
 				
 			}
 			
@@ -340,7 +359,8 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
             isInDrag = YES;
         }
         // Otherwise, extend the selection (if possible)
-        else if (mouseDownItem >= 0 && !isInDrag && !shouldDragItems) {
+		//
+        else if (mouseDownItem >= 0 && !isInDrag && !shouldDragItems && self.headerIsSelectable) {
             // Determine which item is under the mouse
             NSInteger itemUnderMouse = -1;
             if (self.orientation == MBTableHeaderHorizontalOrientation) {

@@ -147,7 +147,7 @@ typedef enum {
 @property (nonatomic, assign) BOOL showsGrabHandles;
 
 @property (nonatomic, strong) MBTableGridContentView *contentView;
-//@property (nonatomic, readonly) MBTableGridHeaderView* columnHeaderView;
+@property (nonatomic, readonly) MBTableGridHeaderView* columnHeaderView;
 @property (nonatomic, readonly) MBTableGridFooterView* columnFooterView;
 @property (nonatomic, readonly) MBTableGridHeaderView* rowHeaderView;
 
@@ -1291,8 +1291,7 @@ cells. A cell can individually override this behavior. */
  */
 - (void)tableGrid:(MBTableGrid *)aTableGrid didAddRows:(NSIndexSet *)rowIndexes;
 
+@required
 - (void)tableGrid:(MBTableGrid*)aTableGrid footerCellClicked:(NSCell*)cell forColumn:(NSUInteger)columnIndex withEvent:(NSEvent*)theEvent;
-
-- (NSTableCellView*)sampleTableCell;
 
 @end

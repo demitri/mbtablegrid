@@ -38,7 +38,5 @@
 - (IBAction)addRow:(id)sender;
 
 @property (nonatomic, strong) IBOutlet MBTableGrid *tableGrid;
-//@property (nonatomic, strong) NSTableCellView *sampleTableCell;
-//- (NSTableCellView*)sampleTableCell;
 
 @end
