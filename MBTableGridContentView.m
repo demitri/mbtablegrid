@@ -1298,6 +1298,32 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 #pragma mark -
 #pragma mark [dm] Layout methods
 
+- (void)reloadTable
+{
+	// To be called directly from MBTableGrid when the table is reloaded.
+	//
+	// remove all cells from view
+	//
+	while (self.gridColumns.count > 0) {
+//	for (DMGridColumn *gridColumn in self.gridColumns.allValues) {
+
+		DMGridColumn *gridColumn = self.gridColumns[self.gridColumns.allKeys[0]];
+		
+		// remove all cells in column from view & make available for reuse
+		while (gridColumn.cellViews.count > 0) {
+			NSView *view = gridColumn.cellViews.lastObject;
+			[view removeFromSuperview];
+			view.hidden = YES;
+			[gridColumn.cellViews removeLastObject];
+			[_tableGrid enqueueView:view forIdentifier:view.identifier];
+		}
+		[self.gridColumns removeObjectForKey:@(gridColumn.column)];
+	}
+	self.needsDisplay = YES;
+
+	[self.gridColumns removeAllObjects];
+}
+
 - (void)resetDocumentView
 {
 	// Reset document (this class) size.
@@ -1482,7 +1508,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			
 			// column no longer visible
 			//
-			// remove all cells in column from view &make available for reuse
+			// remove all cells in column from view & make available for reuse
 			while (gridColumn.cellViews.count > 0) {
 				NSView *view = gridColumn.cellViews.lastObject;
 				//[view removeFromSuperview];

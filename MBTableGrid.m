@@ -1315,6 +1315,8 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	// Restore original visible rectangle of scroller
 	[self scrollToArea:visibleRect animate:NO];
 	
+	[self.contentView reloadTable];
+	
 	[self setNeedsDisplay:YES];
 	[self.contentView setNeedsDisplay:YES];
 	[self.columnHeaderView setNeedsDisplay:YES];
