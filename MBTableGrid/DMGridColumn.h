@@ -11,7 +11,11 @@
 
 @interface DMGridColumn : NSObject
 
+#if __has_feature(objc_generics)
 @property (nonatomic, strong) NSMutableArray<NSView*> *cellViews;	// visible cells views
+#else
+@property (nonatomic, strong) NSMutableArray *cellViews;	// visible cells views
+#endif
 @property (nonatomic, assign) NSRange range;						// range of visible cells
 @property (nonatomic, assign) NSUInteger column;					// column number
 

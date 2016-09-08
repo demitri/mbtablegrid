@@ -193,7 +193,7 @@ NSString* kAutosavedColumnHiddenKey = @"AutosavedColumnHidden";
         
 	} else if (self.orientation == MBTableHeaderVerticalOrientation) {
 		
-		NSLog(@"rect: %@", NSStringFromRect(rect));
+		//NSLog(@"rect: %@", NSStringFromRect(rect));
 		// Draw the row headers
 		NSUInteger numberOfRows = self.tableGrid.numberOfRows;
 		[headerCell setOrientation:self.orientation];

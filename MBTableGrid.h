@@ -150,6 +150,7 @@ typedef enum {
 @property (nonatomic, readonly) MBTableGridHeaderView* columnHeaderView;
 @property (nonatomic, readonly) MBTableGridFooterView* columnFooterView;
 @property (nonatomic, readonly) MBTableGridHeaderView* rowHeaderView;
+@property (nonatomic, strong) IBInspectable NSColor *alternatingRowColor;
 
 - (void)setSelectedRowIndexes:(NSIndexSet *)anIndexSet notify:(BOOL)notify;
 - (void)setSelectedColumnIndexes:(NSIndexSet *)anIndexSet notify:(BOOL)notify;

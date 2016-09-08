@@ -464,9 +464,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //	[self _updateCellSubviewsInRect:rect];
 	
 	NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
-	BOOL overdrawDrequest = NSIntersectsRect(visibleRect, rect) == NO; // don't enqueue cells during a precache rect request
+	BOOL overdrawRequest = NSIntersectsRect(visibleRect, rect) == NO; // don't enqueue cells during a precache rect request
 
-	//NSLog(@"draw rect: %@ %@", NSStringFromRect(rect), overdrawDrequest ? @"(overdraw)" : @"");
+	//NSLog(@"draw rect: %@ %@", NSStringFromRect(rect), overdrawRequest ? @"(overdraw)" : @"");
 
 	//NSRect *rectsBeingDrawn;
 	//NSInteger count;
@@ -594,9 +594,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 	// Remove views at index paths that are no longer in visible + cached rect
 	//
-	//NSLog(@"precache request: %@", overdrawDrequest ? @"True" : @"False");
+	//NSLog(@"precache request: %@", overdrawRequest ? @"True" : @"False");
 	/*
-	if (overdrawDrequest == NO) {
+	if (overdrawRequest == NO) {
 		
 		for (NSNumber *cacheColNumber in self.activeTableCells.allKeys) {
 			
@@ -656,7 +656,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	NSUInteger rectMinRow = MAX([self rowAtPoint:rect.origin], 0);
 	NSUInteger rectMaxRow = MIN([self rowAtPoint:diagonalFromOrigin], _tableGrid.numberOfRows - 1);
 
-	//NSLog(@"c[%d:%d] r[%d:%d] (pre: %@)", minCol, maxCol, minRow, maxRow, overdrawDrequest ? @"Yes" : @"No" );
+	//NSLog(@"c[%d:%d] r[%d:%d] (pre: %@)", minCol, maxCol, minRow, maxRow, overdrawRequest ? @"Yes" : @"No" );
 
 	NSUInteger firstColumn = rectMinCol;
 	NSUInteger lastColumn = rectMaxCol;
