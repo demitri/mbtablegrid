@@ -172,6 +172,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		self.autoresizesSubviews = NO;
 		self.translatesAutoresizingMaskIntoConstraints = NO;
 
+		// These define height, width, but don't position the content view (self) relative to the containing view.
+		// This is done below in "viewDidMoveToSuperview".
+		//
 		self.widthConstraint = [NSLayoutConstraint constraintWithItem:self
 															attribute:NSLayoutAttributeWidth
 															relatedBy:NSLayoutRelationEqual
@@ -186,6 +189,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 															 attribute:NSLayoutAttributeNotAnAttribute
 															multiplier:1.0
 															  constant:frameRect.size.height];
+		
 		[self addConstraints:@[self.widthConstraint, self.heightConstraint]];
 		
 		/*
@@ -273,6 +277,17 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 				 object:self.enclosingScrollView.contentView];
 		 */
 
+		
+		// pin view to origin (can only be done when there is a superview)
+		NSDictionary *views = @{@"self":self};
+		[self.superview addConstraints: [NSLayoutConstraint constraintsWithVisualFormat:@"H:|[self]"
+																				options:0
+																				metrics:nil
+																				  views:views]];
+		[self.superview addConstraints: [NSLayoutConstraint constraintsWithVisualFormat:@"V:|[self]"
+																				options:0
+																				metrics:nil
+																				  views:views]];
 	}
 }
 
