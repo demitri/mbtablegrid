@@ -202,6 +202,10 @@ typedef NS_ENUM(NSUInteger, MBTableGridTrackingPart)
 @property (nonatomic, strong) NSLayoutConstraint *widthConstraint;
 @property (nonatomic, strong) NSLayoutConstraint *heightConstraint;
 
+@property (nonatomic, strong) NSObject *boundsDidChangeObserver;
+@property (nonatomic, strong) NSObject *frameDidChangeObserver;
+
+
 - (void)reloadTable;
 
 @end

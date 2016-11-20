@@ -188,8 +188,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 															  constant:frameRect.size.height];
 		[self addConstraints:@[self.widthConstraint, self.heightConstraint]];
 		
-		self.enclosingScrollView.contentView.postsBoundsChangedNotifications = YES;
-		
+		/*
 		[self addObserver:self
 			   forKeyPath:@"bounds"
 				  options:NSKeyValueObservingOptionNew
@@ -198,35 +197,86 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			   forKeyPath:@"frame"
 				  options:NSKeyValueObservingOptionNew
 				  context:nil];
+		 */
+		/*
 		for (NSString *property in [self _observedTableGridProperties]) {
 			[_tableGrid addObserver:self
 						 forKeyPath:property
 							options:NSKeyValueObservingOptionNew
 							context:nil];
 		}
+		 */
 
 	}
 	return self;
 }
 
+/*
 - (NSArray*)_observedTableGridProperties
 {
 	return [NSArray array];
 //	return @[@"numberOfRows", @"numberOfColumns"];
 }
+ */
 
 - (void)viewDidMoveToSuperview
 {
 	if (self.superview != nil) {
-		[[NSNotificationCenter defaultCenter] addObserver:self
-												 selector:@selector(frameChanged:)
-													 name:@"NSViewFrameDidChangeNotification"
-												   object:self.superview]; // clip view
 
 		NSAssert(self.enclosingScrollView != nil, @"document view not placed inside a scroll view");
+
+		NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
+		NSOperationQueue *mainQueue = [NSOperationQueue mainQueue];
+		
+		self.frameDidChangeObserver = [nc addObserverForName:NSViewFrameDidChangeNotification
+													  object:self.enclosingScrollView.contentView // clip view
+													   queue:mainQueue
+												  usingBlock:^(NSNotification * _Nonnull notification) {
+													  
+													  NSLog(@"new frame: %@ for %@", NSStringFromRect(self.superview.frame), notification.object);
+													  
+													  NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
+													  
+													  float pad = 1.75;
+													  scrollPrefetchPosX = visibleRect.size.width * pad;
+													  scrollPrefetchPosY = visibleRect.size.height * pad;
+													  scrollPrefetchNegX = visibleRect.size.width * pad;
+													  scrollPrefetchNegY = visibleRect.size.height * pad;
+													  
+													  self.heightConstraint.constant = self.frame.size.height;
+													  self.widthConstraint.constant = self.frame.size.width;
+													  self.needsLayout = YES;
+													  
+													  self.needsDisplay = YES;
+												  }];
+		
+		/*
+		[nc addObserver:self
+			   selector:@selector(frameChanged:)
+				   name:NSViewFrameDidChangeNotification
+				 object:self.superview]; // clip view
+		*/
+		
+		self.postsBoundsChangedNotifications = YES;
+		
+		self.boundsDidChangeObserver = [nc addObserverForName:NSViewBoundsDidChangeNotification
+													   object:self.enclosingScrollView.contentView // clip view
+														queue:mainQueue
+												   usingBlock:^(NSNotification * _Nonnull note) {
+													   self.needsLayout = YES;
+												   }];
+		
+		/*
+		[nc addObserver:self
+			   selector:@selector(scrollNotification:)
+				   name:NSViewBoundsDidChangeNotification
+				 object:self.enclosingScrollView.contentView];
+		 */
+
 	}
 }
 
+/*
 - (void)frameChanged:(NSNotification*)notification
 {
 	NSLog(@"new frame: %@ for %@", NSStringFromRect(self.superview.frame), notification.object);
@@ -247,15 +297,25 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	//[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 }
 
+- (void)scrollNotification:(NSNotification *)notification
+{
+	self.needsLayout = YES;
+}
+*/
+
 - (void) dealloc {
 	NSNotificationCenter *nc = [NSNotificationCenter defaultCenter];
-	[nc removeObserver:self];
 	
-	[self removeObserver:self forKeyPath:@"frame"];
-	[self removeObserver:self forKeyPath:@"bounds"];
+	[nc removeObserver:self.frameDidChangeObserver];
+	[nc removeObserver:self.boundsDidChangeObserver];
+	
+//	[nc removeObserver:self];
+	
+//	[self removeObserver:self forKeyPath:@"frame"];
+//	[self removeObserver:self forKeyPath:@"bounds"];
 
-	for (NSString *property in [self _observedTableGridProperties])
-		[_tableGrid removeObserver:self forKeyPath:property];
+//	for (NSString *property in [self _observedTableGridProperties])
+//		[_tableGrid removeObserver:self forKeyPath:property];
 }
 
 /*
@@ -1356,7 +1416,10 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (void)layout
 {
 	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
-	[super layout];
+	
+	if (floor(NSAppKitVersionNumber) < NSAppKitVersionNumber10_12) {
+		[super layout]; // no longer needed on 10.12+
+	}
 }
 
 - (NSArray<NSValue*>*)rangesOfVisibleColumnsAndRowsInRect:(NSRect)rect
@@ -2181,6 +2244,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 #pragma mark -
 #pragma mark Notifications
+#pragma mark -
 
 #pragma mark Field Editor
 
@@ -2481,6 +2545,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 	editedRow = NSNotFound;
 }
  */
+#pragma mark -
 
 #pragma mark Layout Support
 
@@ -2621,6 +2686,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 
 - (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *,id> *)change context:(void *)context
 {
+	/*
 	if (object == self) {
 		if ([keyPath isEqualToString:@"bounds"]) {
 			NSLog(@"content view bounds changed");
@@ -2632,6 +2698,8 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			return;
 		}
 	}
+	*/
+	/*
 	else if (object == self.superview) { // clip view
 		NSLog(@"clip view frame changed");
 		if ([keyPath isEqualToString:@"frame"]) {
@@ -2644,6 +2712,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 			return;
 		}
 	}
+	 */
 	
 	[super observeValueForKeyPath:keyPath ofObject:object change:change context:context];
 }
