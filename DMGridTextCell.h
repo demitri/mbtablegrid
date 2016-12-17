@@ -10,4 +10,7 @@
 
 @interface DMGridTextCell : NSView
 
+// this is just a passthrough to the underlying CATextLayer
+@property (nonatomic) NSString *string;
+
 @end
