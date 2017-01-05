@@ -1431,10 +1431,11 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 - (void)layout
 {
 	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
-	
+
 	if (floor(NSAppKitVersionNumber) < NSAppKitVersionNumber10_12) {
 		[super layout]; // no longer needed on 10.12+
 	}
+	
 }
 
 - (NSArray<NSValue*>*)rangesOfVisibleColumnsAndRowsInRect:(NSRect)rect
@@ -1621,7 +1622,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 		// --------------------
 		NSRange newRowRange;
 		if (minRow == maxRow)
-			newRowRange = NSMakeRange(minRow, 0);
+			newRowRange = NSMakeRange(minRow, 1); // e.g. only one row, make sure length = 1
 		else
 			newRowRange = NSMakeRange(minRow, maxRow - minRow + 1);
 		
