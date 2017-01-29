@@ -100,7 +100,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 //@property (nonatomic, strong) NSMutableDictionary<NSNumber*, NSView*> *visibleCellsForColumn;
 @property (nonatomic, strong) NSMutableDictionary<NSNumber*,DMGridColumn*> *gridColumns;
 - (void)_updateCellSubviewsInRect:(NSRect)rect;
-- (NSArray*)_observedTableGridProperties;
+//- (NSArray*)_observedTableGridProperties;
 @end
 
 #pragma mark -
