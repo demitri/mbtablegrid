@@ -30,4 +30,14 @@
 	return textLayer;
 }
 
+- (NSString*)string
+{
+	return [(CATextLayer*)self.layer string];
+}
+
+- (void)setString:(NSString*)newString
+{
+	[(CATextLayer*)self.layer setString:newString];
+}
+
 @end

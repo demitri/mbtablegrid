@@ -1432,9 +1432,9 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 {
 	[self _updateCellSubviewsInRect:self.enclosingScrollView.documentVisibleRect];
 	
-	if (floor(NSAppKitVersionNumber) < NSAppKitVersionNumber10_12) {
-		[super layout]; // no longer needed on 10.12+
-	}
+//	if (floor(NSAppKitVersionNumber) < NSAppKitVersionNumber10_12) {
+//		[super layout]; // no longer needed on 10.12+
+//	}
 }
 
 - (NSArray<NSValue*>*)rangesOfVisibleColumnsAndRowsInRect:(NSRect)rect
