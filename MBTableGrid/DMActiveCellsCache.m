@@ -14,7 +14,7 @@
 {
 	self = [super init];
 	if (self) {
-		self.columns = [NSMutableDictionary dictionary];
+		self.columns = [NSMutableArray array];
 	}
 	return self;
 }

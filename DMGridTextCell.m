@@ -35,9 +35,9 @@
 	return [(CATextLayer*)self.layer string];
 }
 
-- (void)setString:(NSString*)newString
+- (void)setString:(NSString *)newString
 {
-	[(CATextLayer*)self.layer setString:newString];
+	((CATextLayer*)self.layer).string = newString;
 }
 
 @end
