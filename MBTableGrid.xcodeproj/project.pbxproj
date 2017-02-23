@@ -27,7 +27,6 @@
 		A6AF0B7F1CFC9B3E0037CC70 /* DMActiveCellsCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A6AF0B801CFC9B3E0037CC70 /* DMActiveCellsCache.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */; };
 		A6AF179C1D7AABB2009A9FBA /* DMTextLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF179A1D7AABB2009A9FBA /* DMTextLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		A6AF179D1D7AABB2009A9FBA /* DMTextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */; };
 		A6AF179E1D7AABB2009A9FBA /* DMTextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */; };
 		A6F67D601D25C54100A087C6 /* CellViewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D5F1D25C54100A087C6 /* CellViewsController.m */; };
 		A6F67D631D26D7FC00A087C6 /* PopupButtonTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D621D26D7FC00A087C6 /* PopupButtonTableCellView.m */; };
@@ -459,7 +458,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				8D11072D0486CEB800E47090 /* main.m in Sources */,
-				A6AF179D1D7AABB2009A9FBA /* DMTextLayer.m in Sources */,
 				A6F67D631D26D7FC00A087C6 /* PopupButtonTableCellView.m in Sources */,
 				C9412A5F0D8AE98C00E9E614 /* MBTableGridController.m in Sources */,
 				A6F67D601D25C54100A087C6 /* CellViewsController.m in Sources */,

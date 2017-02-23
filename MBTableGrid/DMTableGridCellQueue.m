@@ -127,7 +127,10 @@
 			[nib instantiateWithOwner:nil topLevelObjects:&topLevelObjects];
 		}
 		else {
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 			[nib instantiateNibWithOwner:nil topLevelObjects:&topLevelObjects]; // deprecated in 10.8
+#pragma clang diagnostic pop
 		}
 		
 		// find the object that has the requested identifier

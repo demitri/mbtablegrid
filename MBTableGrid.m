@@ -261,6 +261,15 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	return self;
 }
 
+
+- (NSSize)intrinsicContentSize
+{
+	// This was being set to a very small size (8, 20), which was forcing the view to
+	// the minimum height of any other window/view constraints.
+	// Not sure where this was being set.
+	return NSMakeSize(NSViewNoIntrinsicMetric, NSViewNoIntrinsicMetric);
+}
+
 - (void) setShowsGrabHandles:(BOOL)s {
 	showsGrabHandles = s;
 	[self.contentView setShowsGrabHandle:s];
