@@ -237,7 +237,7 @@ NSString * const MBTableGridTrackingPartKey = @"part";
 													   queue:mainQueue
 												  usingBlock:^(NSNotification * _Nonnull notification) {
 													  
-													  NSLog(@"new frame: %@ for %@", NSStringFromRect(self.superview.frame), notification.object);
+													  //NSLog(@"new frame: %@ for %@", NSStringFromRect(self.superview.frame), notification.object);
 													  
 													  NSRect visibleRect = [self.superview convertRect:self.superview.bounds toView:self]; // convert clip view rect to this view
 													  
