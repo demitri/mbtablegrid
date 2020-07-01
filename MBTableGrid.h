@@ -596,7 +596,7 @@ cells. A cell can individually override this behavior. */
 
 //- (void)registerNib:(NSNib *)nib forIdentifier:(NSString *)identifier andOwner:(id)owner;
 - (void)registerViewWithIdentifier:(NSString*)identifier fromNib:(NSNib*)nib; //andOwnerClass:(id)owner;
-- (void)registerViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)())block;
+- (void)registerViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)(void))block;
 - (NSView*)makeViewWithIdentifier:(NSString*)identifier; // owner:(id)owner;
 //- (NSView*)makeViewWithIdentifier:(NSString*)identifier fromBlock:(NSView* (^)())block;
 - (void)enqueueView:(NSView*)view forIdentifier:(NSString*)identifier;

@@ -267,7 +267,15 @@ NSString *MBTableGridRowDataType = @"mbtablegrid.pasteboard.row";
 	// This was being set to a very small size (8, 20), which was forcing the view to
 	// the minimum height of any other window/view constraints.
 	// Not sure where this was being set.
-	return NSMakeSize(NSViewNoIntrinsicMetric, NSViewNoIntrinsicMetric);
+	//	if (NSAppKitVersionNumber >= 1404)
+	if (@available(macOS 14, *))
+		return NSMakeSize(NSViewNoIntrinsicMetric, NSViewNoIntrinsicMetric);
+	else {
+		//return NSMakeSize(NSViewNoInstrinsicMetric, NSViewNoInstrinsicMetric); // misspelled in API!
+		// hard code values for older OS versions; they won't change
+		// see: https://forums.developer.apple.com/thread/51969
+		return NSMakeSize(-1, -1);
+	}
 }
 
 - (void) setShowsGrabHandles:(BOOL)s {

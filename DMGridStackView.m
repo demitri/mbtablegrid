@@ -58,7 +58,7 @@
 	for (NSView *view in self.views) {
 		[indices addObject:[[view.subviews objectAtIndex:0] stringValue]];
 	}
-	NSLog(@"indices: %@", [indices componentsJoinedByString:@","]);
+	//NSLog(@"indices: %@", [indices componentsJoinedByString:@","]);
 }
 
 @end
