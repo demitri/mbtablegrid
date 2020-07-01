@@ -15,18 +15,22 @@
 		8D11072F0486CEB800E47090 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */; };
 		A6141EA31D16D58C00B4B7E4 /* DMGridTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A6141EA01D16D25500B4B7E4 /* DMGridTextCell.m */; };
 		A6141EA61D16D76300B4B7E4 /* Quartz.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C646837F18DB8634008700EF /* Quartz.framework */; };
+		A61D18A424AD292C003E1D64 /* DMGridTextCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A61D18A324AD292C003E1D64 /* DMGridTextCell.m */; };
+		A61D18A824AD294C003E1D64 /* DMTextLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A61D18A724AD294C003E1D64 /* DMTextLayer.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		A61D18AB24AD29A6003E1D64 /* MBTableGridCell.h in Headers */ = {isa = PBXBuildFile; fileRef = A61D18A924AD29A5003E1D64 /* MBTableGridCell.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A61D18AC24AD29A6003E1D64 /* MBTableGridCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A61D18AA24AD29A6003E1D64 /* MBTableGridCell.m */; };
 		A65F4B1B1D10563900D039BD /* DMGridStackView.h in Headers */ = {isa = PBXBuildFile; fileRef = A65F4B191D10563900D039BD /* DMGridStackView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		A65F4B1C1D10563900D039BD /* DMGridStackView.m in Sources */ = {isa = PBXBuildFile; fileRef = A65F4B1A1D10563900D039BD /* DMGridStackView.m */; };
-		A66E2A451D10F3BA006B1AA1 /* DMGridColumn.h in Headers */ = {isa = PBXBuildFile; fileRef = A66E2A431D10F3BA006B1AA1 /* DMGridColumn.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A66E2A451D10F3BA006B1AA1 /* DMGridColumn.h in Headers */ = {isa = PBXBuildFile; fileRef = A66E2A431D10F3BA006B1AA1 /* DMGridColumn.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A66E2A461D10F3BA006B1AA1 /* DMGridColumn.m in Sources */ = {isa = PBXBuildFile; fileRef = A66E2A441D10F3BA006B1AA1 /* DMGridColumn.m */; };
 		A6AF0B6B1CF4F33D0037CC70 /* MyTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B6A1CF4F33D0037CC70 /* MyTableCellView.m */; };
 		A6AF0B6C1CF4F3C20037CC70 /* MyTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B6A1CF4F33D0037CC70 /* MyTableCellView.m */; };
 		A6AF0B6F1CF56AC90037CC70 /* DMTableGridCellQueue.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF0B6D1CF56AC90037CC70 /* DMTableGridCellQueue.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A6AF0B701CF56AC90037CC70 /* DMTableGridCellQueue.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B6E1CF56AC90037CC70 /* DMTableGridCellQueue.m */; };
 		A6AF0B721CF598180037CC70 /* CellViews.xib in Resources */ = {isa = PBXBuildFile; fileRef = A6AF0B711CF598180037CC70 /* CellViews.xib */; };
-		A6AF0B7F1CFC9B3E0037CC70 /* DMActiveCellsCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A6AF0B7F1CFC9B3E0037CC70 /* DMActiveCellsCache.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A6AF0B801CFC9B3E0037CC70 /* DMActiveCellsCache.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */; };
-		A6AF179C1D7AABB2009A9FBA /* DMTextLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF179A1D7AABB2009A9FBA /* DMTextLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		A6AF179C1D7AABB2009A9FBA /* DMGridTextCell.h in Headers */ = {isa = PBXBuildFile; fileRef = A6AF179A1D7AABB2009A9FBA /* DMGridTextCell.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		A6AF179E1D7AABB2009A9FBA /* DMTextLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */; };
 		A6F67D601D25C54100A087C6 /* CellViewsController.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D5F1D25C54100A087C6 /* CellViewsController.m */; };
 		A6F67D631D26D7FC00A087C6 /* PopupButtonTableCellView.m in Sources */ = {isa = PBXBuildFile; fileRef = A6F67D621D26D7FC00A087C6 /* PopupButtonTableCellView.m */; };
@@ -72,8 +76,8 @@
 /* Begin PBXFileReference section */
 		1058C7A1FEA54F0111CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = /System/Library/Frameworks/CoreData.framework; sourceTree = "<absolute>"; };
-		173D292B1AA1779F009945FC /* MBFooterTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBFooterTextCell.h; path = "mbtablegrid-demitri/MBFooterTextCell.h"; sourceTree = GITHUB; };
-		173D292C1AA1779F009945FC /* MBFooterTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBFooterTextCell.m; path = "mbtablegrid-demitri/MBFooterTextCell.m"; sourceTree = GITHUB; };
+		173D292B1AA1779F009945FC /* MBFooterTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBFooterTextCell.h; sourceTree = SOURCE_ROOT; };
+		173D292C1AA1779F009945FC /* MBFooterTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBFooterTextCell.m; sourceTree = SOURCE_ROOT; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -85,31 +89,35 @@
 		8D1107320486CEB800E47090 /* MBTableGrid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MBTableGrid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A6141E9F1D16D25500B4B7E4 /* DMGridTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMGridTextCell.h; sourceTree = "<group>"; };
 		A6141EA01D16D25500B4B7E4 /* DMGridTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMGridTextCell.m; sourceTree = "<group>"; };
+		A61D18A324AD292C003E1D64 /* DMGridTextCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMGridTextCell.m; sourceTree = SOURCE_ROOT; };
+		A61D18A724AD294C003E1D64 /* DMTextLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMTextLayer.h; sourceTree = SOURCE_ROOT; };
+		A61D18A924AD29A5003E1D64 /* MBTableGridCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridCell.h; sourceTree = SOURCE_ROOT; };
+		A61D18AA24AD29A6003E1D64 /* MBTableGridCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGridCell.m; sourceTree = SOURCE_ROOT; };
 		A65F4B191D10563900D039BD /* DMGridStackView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMGridStackView.h; sourceTree = "<group>"; };
 		A65F4B1A1D10563900D039BD /* DMGridStackView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMGridStackView.m; sourceTree = "<group>"; };
-		A66E2A431D10F3BA006B1AA1 /* DMGridColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; name = DMGridColumn.h; path = "mbtablegrid-demitri/MBTableGrid/DMGridColumn.h"; sourceTree = GITHUB; };
-		A66E2A441D10F3BA006B1AA1 /* DMGridColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; name = DMGridColumn.m; path = "mbtablegrid-demitri/MBTableGrid/DMGridColumn.m"; sourceTree = GITHUB; };
+		A66E2A431D10F3BA006B1AA1 /* DMGridColumn.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMGridColumn.h; path = MBTableGrid/DMGridColumn.h; sourceTree = SOURCE_ROOT; };
+		A66E2A441D10F3BA006B1AA1 /* DMGridColumn.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DMGridColumn.m; path = MBTableGrid/DMGridColumn.m; sourceTree = SOURCE_ROOT; };
 		A6AF0B691CF4F33D0037CC70 /* MyTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MyTableCellView.h; sourceTree = "<group>"; };
 		A6AF0B6A1CF4F33D0037CC70 /* MyTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MyTableCellView.m; sourceTree = "<group>"; };
-		A6AF0B6D1CF56AC90037CC70 /* DMTableGridCellQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; name = DMTableGridCellQueue.h; path = "mbtablegrid-demitri/MBTableGrid/DMTableGridCellQueue.h"; sourceTree = GITHUB; };
-		A6AF0B6E1CF56AC90037CC70 /* DMTableGridCellQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; name = DMTableGridCellQueue.m; path = "mbtablegrid-demitri/MBTableGrid/DMTableGridCellQueue.m"; sourceTree = GITHUB; };
+		A6AF0B6D1CF56AC90037CC70 /* DMTableGridCellQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMTableGridCellQueue.h; path = MBTableGrid/DMTableGridCellQueue.h; sourceTree = SOURCE_ROOT; };
+		A6AF0B6E1CF56AC90037CC70 /* DMTableGridCellQueue.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DMTableGridCellQueue.m; path = MBTableGrid/DMTableGridCellQueue.m; sourceTree = SOURCE_ROOT; };
 		A6AF0B711CF598180037CC70 /* CellViews.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CellViews.xib; sourceTree = "<group>"; };
-		A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */ = {isa = PBXFileReference; fileEncoding = 4; name = DMActiveCellsCache.h; path = "mbtablegrid-demitri/MBTableGrid/DMActiveCellsCache.h"; sourceTree = GITHUB; };
-		A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */ = {isa = PBXFileReference; fileEncoding = 4; name = DMActiveCellsCache.m; path = "mbtablegrid-demitri/MBTableGrid/DMActiveCellsCache.m"; sourceTree = GITHUB; };
-		A6AF179A1D7AABB2009A9FBA /* DMTextLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; name = DMTextLayer.h; path = "mbtablegrid-demitri/DMTextLayer.h"; sourceTree = GITHUB; };
-		A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; name = DMTextLayer.m; path = "mbtablegrid-demitri/DMTextLayer.m"; sourceTree = GITHUB; };
+		A6AF0B7D1CFC9B3E0037CC70 /* DMActiveCellsCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DMActiveCellsCache.h; path = MBTableGrid/DMActiveCellsCache.h; sourceTree = SOURCE_ROOT; };
+		A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DMActiveCellsCache.m; path = MBTableGrid/DMActiveCellsCache.m; sourceTree = SOURCE_ROOT; };
+		A6AF179A1D7AABB2009A9FBA /* DMGridTextCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DMGridTextCell.h; sourceTree = SOURCE_ROOT; };
+		A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DMTextLayer.m; sourceTree = SOURCE_ROOT; };
 		A6B2945F2421D76900F0C463 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A6DC8441226FDA5700FFA1C1 /* Base */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Base; path = Base.lproj/MainMenu.nib; sourceTree = "<group>"; };
 		A6F67D5E1D25C54100A087C6 /* CellViewsController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CellViewsController.h; sourceTree = "<group>"; };
 		A6F67D5F1D25C54100A087C6 /* CellViewsController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CellViewsController.m; sourceTree = "<group>"; };
 		A6F67D611D26D7FC00A087C6 /* PopupButtonTableCellView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PopupButtonTableCellView.h; sourceTree = "<group>"; };
 		A6F67D621D26D7FC00A087C6 /* PopupButtonTableCellView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PopupButtonTableCellView.m; sourceTree = "<group>"; };
-		C63413B41A19F857001E9DF0 /* MBLevelIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBLevelIndicatorCell.h; path = "mbtablegrid-demitri/MBLevelIndicatorCell.h"; sourceTree = GITHUB; };
-		C63413B51A19F857001E9DF0 /* MBLevelIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBLevelIndicatorCell.m; path = "mbtablegrid-demitri/MBLevelIndicatorCell.m"; sourceTree = GITHUB; };
-		C639542A19FF3B7C0029BDF1 /* MBPopupButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBPopupButtonCell.h; path = "mbtablegrid-demitri/MBPopupButtonCell.h"; sourceTree = GITHUB; };
-		C639542B19FF3B7C0029BDF1 /* MBPopupButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBPopupButtonCell.m; path = "mbtablegrid-demitri/MBPopupButtonCell.m"; sourceTree = GITHUB; };
-		C639542E19FF84FA0029BDF1 /* MBButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBButtonCell.h; path = "mbtablegrid-demitri/MBButtonCell.h"; sourceTree = GITHUB; };
-		C639542F19FF84FA0029BDF1 /* MBButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBButtonCell.m; path = "mbtablegrid-demitri/MBButtonCell.m"; sourceTree = GITHUB; };
+		C63413B41A19F857001E9DF0 /* MBLevelIndicatorCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBLevelIndicatorCell.h; sourceTree = SOURCE_ROOT; };
+		C63413B51A19F857001E9DF0 /* MBLevelIndicatorCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBLevelIndicatorCell.m; sourceTree = SOURCE_ROOT; };
+		C639542A19FF3B7C0029BDF1 /* MBPopupButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBPopupButtonCell.h; sourceTree = SOURCE_ROOT; };
+		C639542B19FF3B7C0029BDF1 /* MBPopupButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBPopupButtonCell.m; sourceTree = SOURCE_ROOT; };
+		C639542E19FF84FA0029BDF1 /* MBButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBButtonCell.h; sourceTree = SOURCE_ROOT; };
+		C639542F19FF84FA0029BDF1 /* MBButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBButtonCell.m; sourceTree = SOURCE_ROOT; };
 		C63DB4CB1A19DA030069BF5D /* QuickLook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickLook.framework; path = System/Library/Frameworks/QuickLook.framework; sourceTree = SDKROOT; };
 		C63F9EB2186AE60C00DB171F /* sort-asc.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sort-asc.png"; sourceTree = "<group>"; };
 		C63F9EB3186AE60C00DB171F /* sort-asc@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sort-asc@2x.png"; sourceTree = "<group>"; };
@@ -117,28 +125,28 @@
 		C63F9EB5186AE60C00DB171F /* sort-desc@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "sort-desc@2x.png"; sourceTree = "<group>"; };
 		C646837D18DB862A008700EF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		C646837F18DB8634008700EF /* Quartz.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Quartz.framework; path = System/Library/Frameworks/Quartz.framework; sourceTree = SDKROOT; };
-		C6AB1C241A15C3AB0092B29C /* MBImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBImageCell.h; path = "mbtablegrid-demitri/MBImageCell.h"; sourceTree = GITHUB; };
-		C6AB1C251A15C3AB0092B29C /* MBImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBImageCell.m; path = "mbtablegrid-demitri/MBImageCell.m"; sourceTree = GITHUB; };
+		C6AB1C241A15C3AB0092B29C /* MBImageCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBImageCell.h; sourceTree = SOURCE_ROOT; };
+		C6AB1C251A15C3AB0092B29C /* MBImageCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBImageCell.m; sourceTree = SOURCE_ROOT; };
 		C6AB1C281A15F0DF0092B29C /* rose.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = rose.jpg; sourceTree = "<group>"; };
 		C6AB1C2C1A16B18B0092B29C /* acc-quicklook.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "acc-quicklook.png"; sourceTree = "<group>"; };
 		C6AB1C2D1A16B18B0092B29C /* acc-quicklook@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "acc-quicklook@2x.png"; sourceTree = "<group>"; };
-		C6BF26861A4AC4EE008EB93F /* MBTableGridFooterView.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridFooterView.m; path = "mbtablegrid-demitri/MBTableGridFooterView.m"; sourceTree = GITHUB; };
-		C6BF26881A4AC502008EB93F /* MBTableGridFooterView.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridFooterView.h; path = "mbtablegrid-demitri/MBTableGridFooterView.h"; sourceTree = GITHUB; };
-		C6BF268A1A4AC953008EB93F /* MBFooterPopupButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBFooterPopupButtonCell.h; path = "mbtablegrid-demitri/MBFooterPopupButtonCell.h"; sourceTree = GITHUB; };
-		C6BF268C1A4AC967008EB93F /* MBFooterPopupButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBFooterPopupButtonCell.m; path = "mbtablegrid-demitri/MBFooterPopupButtonCell.m"; sourceTree = GITHUB; };
-		C9412A3D0D8A061C00E9E614 /* MBTableGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGrid.h; path = "mbtablegrid-demitri/MBTableGrid.h"; sourceTree = GITHUB; };
-		C9412A3E0D8A061C00E9E614 /* MBTableGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGrid.m; path = "mbtablegrid-demitri/MBTableGrid.m"; sourceTree = GITHUB; };
-		C9412A490D8A294F00E9E614 /* MBTableGridHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridHeaderCell.h; path = "mbtablegrid-demitri/MBTableGridHeaderCell.h"; sourceTree = GITHUB; };
-		C9412A4A0D8A294F00E9E614 /* MBTableGridHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridHeaderCell.m; path = "mbtablegrid-demitri/MBTableGridHeaderCell.m"; sourceTree = GITHUB; };
+		C6BF26861A4AC4EE008EB93F /* MBTableGridFooterView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGridFooterView.m; sourceTree = SOURCE_ROOT; };
+		C6BF26881A4AC502008EB93F /* MBTableGridFooterView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridFooterView.h; sourceTree = SOURCE_ROOT; };
+		C6BF268A1A4AC953008EB93F /* MBFooterPopupButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBFooterPopupButtonCell.h; sourceTree = SOURCE_ROOT; };
+		C6BF268C1A4AC967008EB93F /* MBFooterPopupButtonCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBFooterPopupButtonCell.m; sourceTree = SOURCE_ROOT; };
+		C9412A3D0D8A061C00E9E614 /* MBTableGrid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGrid.h; sourceTree = SOURCE_ROOT; };
+		C9412A3E0D8A061C00E9E614 /* MBTableGrid.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGrid.m; sourceTree = SOURCE_ROOT; };
+		C9412A490D8A294F00E9E614 /* MBTableGridHeaderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridHeaderCell.h; sourceTree = SOURCE_ROOT; };
+		C9412A4A0D8A294F00E9E614 /* MBTableGridHeaderCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGridHeaderCell.m; sourceTree = SOURCE_ROOT; };
 		C9412A5D0D8AE98C00E9E614 /* MBTableGridController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridController.h; sourceTree = "<group>"; };
 		C9412A5E0D8AE98C00E9E614 /* MBTableGridController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGridController.m; sourceTree = "<group>"; };
-		C9412B200D8B2C5E00E9E614 /* MBTableGridContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridContentView.h; path = "mbtablegrid-demitri/MBTableGridContentView.h"; sourceTree = GITHUB; };
-		C9412B210D8B2C5E00E9E614 /* MBTableGridContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridContentView.m; path = "mbtablegrid-demitri/MBTableGridContentView.m"; sourceTree = GITHUB; };
-		C9412B380D8B2F5400E9E614 /* MBTableGridHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridHeaderView.h; path = "mbtablegrid-demitri/MBTableGridHeaderView.h"; sourceTree = GITHUB; };
-		C9412B390D8B2F5400E9E614 /* MBTableGridHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridHeaderView.m; path = "mbtablegrid-demitri/MBTableGridHeaderView.m"; sourceTree = GITHUB; };
-		C9412D7B0D8B5AB900E9E614 /* MBTableGridCell.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridCell.h; path = "mbtablegrid-demitri/MBTableGridCell.h"; sourceTree = GITHUB; };
-		C9412D7C0D8B5AB900E9E614 /* MBTableGridCell.m */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridCell.m; path = "mbtablegrid-demitri/MBTableGridCell.m"; sourceTree = GITHUB; };
-		CA46E3611A09726A00C43B4B /* MBTableGridEditable.h */ = {isa = PBXFileReference; fileEncoding = 4; name = MBTableGridEditable.h; path = "mbtablegrid-demitri/MBTableGridEditable.h"; sourceTree = GITHUB; };
+		C9412B200D8B2C5E00E9E614 /* MBTableGridContentView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridContentView.h; sourceTree = SOURCE_ROOT; };
+		C9412B210D8B2C5E00E9E614 /* MBTableGridContentView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGridContentView.m; sourceTree = SOURCE_ROOT; };
+		C9412B380D8B2F5400E9E614 /* MBTableGridHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridHeaderView.h; sourceTree = SOURCE_ROOT; };
+		C9412B390D8B2F5400E9E614 /* MBTableGridHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGridHeaderView.m; sourceTree = SOURCE_ROOT; };
+		C9412D7B0D8B5AB900E9E614 /* MBTableGridCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridCell.h; sourceTree = SOURCE_ROOT; };
+		C9412D7C0D8B5AB900E9E614 /* MBTableGridCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBTableGridCell.m; sourceTree = SOURCE_ROOT; };
+		CA46E3611A09726A00C43B4B /* MBTableGridEditable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBTableGridEditable.h; sourceTree = SOURCE_ROOT; };
 		E2E62BAA1781C33400F36275 /* MBTableGrid.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MBTableGrid.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		E2E62BAB1781C33400F36275 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		E2E62BAF1781C33500F36275 /* MBTableGrid-Info.plist */ = {isa = PBXFileReference; name = "MBTableGrid-Info.plist"; path = "mbtablegrid-demitri/MBTableGrid/MBTableGrid-Info.plist"; sourceTree = GITHUB; };
@@ -276,6 +284,8 @@
 			children = (
 				C9412A3D0D8A061C00E9E614 /* MBTableGrid.h */,
 				C9412A3E0D8A061C00E9E614 /* MBTableGrid.m */,
+				A61D18A924AD29A5003E1D64 /* MBTableGridCell.h */,
+				A61D18AA24AD29A6003E1D64 /* MBTableGridCell.m */,
 				C9412B200D8B2C5E00E9E614 /* MBTableGridContentView.h */,
 				C9412B210D8B2C5E00E9E614 /* MBTableGridContentView.m */,
 				C6BF26881A4AC502008EB93F /* MBTableGridFooterView.h */,
@@ -306,7 +316,9 @@
 				A6AF0B7E1CFC9B3E0037CC70 /* DMActiveCellsCache.m */,
 				A66E2A431D10F3BA006B1AA1 /* DMGridColumn.h */,
 				A66E2A441D10F3BA006B1AA1 /* DMGridColumn.m */,
-				A6AF179A1D7AABB2009A9FBA /* DMTextLayer.h */,
+				A6AF179A1D7AABB2009A9FBA /* DMGridTextCell.h */,
+				A61D18A324AD292C003E1D64 /* DMGridTextCell.m */,
+				A61D18A724AD294C003E1D64 /* DMTextLayer.h */,
 				A6AF179B1D7AABB2009A9FBA /* DMTextLayer.m */,
 			);
 			path = MBTableGrid;
@@ -333,13 +345,15 @@
 				E2E62BFB1781C53800F36275 /* MBTableGridCell.h in Headers */,
 				C6BF268B1A4AC953008EB93F /* MBFooterPopupButtonCell.h in Headers */,
 				C639543019FF84FA0029BDF1 /* MBButtonCell.h in Headers */,
+				A61D18AB24AD29A6003E1D64 /* MBTableGridCell.h in Headers */,
 				CA46E3621A09726A00C43B4B /* MBTableGridEditable.h in Headers */,
 				C639542C19FF3B7C0029BDF1 /* MBPopupButtonCell.h in Headers */,
 				C6AB1C261A15C3AB0092B29C /* MBImageCell.h in Headers */,
 				C63413B61A19F857001E9DF0 /* MBLevelIndicatorCell.h in Headers */,
 				E2E62BFA1781C53800F36275 /* MBTableGridHeaderCell.h in Headers */,
 				E2E62BF71781C53800F36275 /* MBTableGrid.h in Headers */,
-				A6AF179C1D7AABB2009A9FBA /* DMTextLayer.h in Headers */,
+				A6AF179C1D7AABB2009A9FBA /* DMGridTextCell.h in Headers */,
+				A61D18A824AD294C003E1D64 /* DMTextLayer.h in Headers */,
 				E2E62BF81781C53800F36275 /* MBTableGridContentView.h in Headers */,
 				A6AF0B7F1CFC9B3E0037CC70 /* DMActiveCellsCache.h in Headers */,
 				E2E62BF91781C53800F36275 /* MBTableGridHeaderView.h in Headers */,
@@ -489,6 +503,8 @@
 				A6141EA31D16D58C00B4B7E4 /* DMGridTextCell.m in Sources */,
 				C639542D19FF3B7C0029BDF1 /* MBPopupButtonCell.m in Sources */,
 				A66E2A461D10F3BA006B1AA1 /* DMGridColumn.m in Sources */,
+				A61D18A424AD292C003E1D64 /* DMGridTextCell.m in Sources */,
+				A61D18AC24AD29A6003E1D64 /* MBTableGridCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -675,6 +691,7 @@
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/MBTableGrid";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
@@ -709,6 +726,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/MBTableGrid";
 				INFOPLIST_FILE = Info.plist;
 				INSTALL_PATH = "@loader_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
